@@ -45,7 +45,8 @@ If the preview server is not running, serve this folder with any static HTTP ser
 - Day / Night theme toggle
 - Final-page archive index
 - Final-page Story Lines view with main nodes and branch nodes
-- Final-page Relation Graph view with typed nodes and relationship links
+- Final-page Relation Graph view with typed nodes, relationship links, hover highlighting, node dragging, canvas panning, and wheel zoom
+- Fixed footer with copyright text following the Spirit Connect reference site pattern
 
 ## Editing Content
 

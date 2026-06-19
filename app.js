@@ -143,13 +143,14 @@ const uiText = {
     htmlLang: "zh-CN",
     navOverview: "档案总览",
     navStory: "故事线",
+    brand: "灵接幻想",
     day: "白天",
     night: "夜间",
     enter: "进入小说档案",
     introEyebrow: "另一个世界 · 叙事档案馆",
-    introTitle: "十二座灵接舱，十二本未醒来的书。",
+    introTitle: "灵接幻想",
     introBody:
-      "这里把 Spirit Connect Fantasy 的小说设定整理成一个可漫游的档案空间：镜头会从中央环形大厅进入每一座舱，展示书卷封面、核心概念与后续阅读入口。",
+      "六座灵接舱，六本正在醒来的书。镜头会从中央环形大厅进入每一座舱，展示书卷封面、核心概念与后续阅读入口。",
     archiveEyebrow: "ARCHIVE INDEX",
     archiveTitle: "Spirit Connect Fantasy 书卷序列",
     archiveLead:
@@ -159,6 +160,7 @@ const uiText = {
     storyHint: "故事线正在生成……点击任意节点查看事件。",
     graphHint: "点击节点查看说明；悬停可高亮它的所有连接。",
     mainLine: "主线",
+    footerCopy: "© 2026 灵接幻想 · Spirit Connect Fantasy. All rights reserved.",
     reservedPrefix: "预留舱",
     reservedText: "后续卷宗入口预留。",
   },
@@ -166,13 +168,14 @@ const uiText = {
     htmlLang: "en",
     navOverview: "Archive",
     navStory: "Storylines",
+    brand: "SPIRIT CONNECT FANTASY",
     day: "Day",
     night: "Night",
     enter: "Open archive",
     introEyebrow: "Another World · Narrative Archive",
-    introTitle: "Twelve cabins. Twelve books waiting to wake.",
+    introTitle: "Spirit Connect Fantasy",
     introBody:
-      "This immersive archive turns Spirit Connect Fantasy into a navigable chamber: the camera moves from the central ring to each cabin, revealing covers, concepts, and reading entry points.",
+      "Six connection cabins. Six books waking in sequence. The camera moves from the central ring to each cabin, revealing covers, concepts, and reading entry points.",
     archiveEyebrow: "ARCHIVE INDEX",
     archiveTitle: "Spirit Connect Fantasy Book Sequence",
     archiveLead:
@@ -182,6 +185,7 @@ const uiText = {
     storyHint: "The line is drawing... click any node to read the event.",
     graphHint: "Click a node to read about it; hover to light up its connections.",
     mainLine: "Main line",
+    footerCopy: "© 2026 Spirit Connect Fantasy. All rights reserved.",
     reservedPrefix: "Reserved Cabin",
     reservedText: "Future volume entry reserved.",
   },
@@ -306,22 +310,22 @@ const graphLinks = [["b1","jim"],["b1","e2118"],["b1","elara"],["b1","terasa"],[
 
 const themes = {
   day: {
-    bg: "#d5e3ef",
-    fog: "#dbe7f0",
-    fogNear: 95,
-    fogFar: 430,
-    floor: "#b6c6d3",
-    shell: "#dce8f1",
-    pearl: "#96aabc",
-    glass: "#50bce8",
-    darkGlass: "#18314a",
-    rail: "#51697d",
-    hemiSky: "#eaf6ff",
-    hemiGround: "#3e5367",
-    hemiIntensity: 1.05,
-    keyIntensity: 2.6,
-    env: 0.36,
-    bloom: 0.56,
+    bg: "#e7dfd0",
+    fog: "#ddd4c4",
+    fogNear: 120,
+    fogFar: 460,
+    floor: "#c9c0b0",
+    shell: "#b9c0c6",
+    pearl: "#8e9aa5",
+    glass: "#6fc6e5",
+    darkGlass: "#263b4d",
+    rail: "#66717a",
+    hemiSky: "#f8f1e5",
+    hemiGround: "#5d6570",
+    hemiIntensity: 0.95,
+    keyIntensity: 2.35,
+    env: 0.32,
+    bloom: 0.5,
   },
   night: {
     bg: "#04080f",
@@ -375,6 +379,7 @@ const archiveList = document.getElementById("archive-list");
 const els = {
   navOverview: document.querySelector("[data-i18n='navOverview']"),
   navStory: document.querySelector("[data-i18n='navStory']"),
+  brand: document.querySelector("[data-i18n='brand']"),
   introEyebrow: document.querySelector("[data-i18n='introEyebrow']"),
   introTitle: document.querySelector("[data-i18n='introTitle']"),
   introBody: document.querySelector("[data-i18n='introBody']"),
@@ -382,6 +387,7 @@ const els = {
   archiveTitle: document.querySelector("[data-i18n='archiveTitle']"),
   archiveLead: document.querySelector("[data-i18n='archiveLead']"),
   graphTip: document.querySelector("[data-i18n='graphTip']"),
+  footerCopy: document.querySelector("[data-i18n='footerCopy']"),
   bookLink: document.querySelector("[data-i18n='enter']"),
   langButtons: [...document.querySelectorAll("[data-lang]")],
   modeButtons: [...document.querySelectorAll("[data-mode]")],
@@ -403,6 +409,10 @@ let hoveredGraphNode = null;
 let graphInitialized = false;
 let graphHiddenTypes = {};
 let graphCamera = { x: 0, y: 0, k: 1 };
+let graphDraggingNode = null;
+let graphPanning = false;
+let graphLastPointer = null;
+let graphPointerMoved = false;
 
 scrollStage.style.position = "fixed";
 scrollStage.style.inset = "0";
@@ -496,13 +506,14 @@ function cabinPoint(index, radius = 134, y = 16) {
 
 function buildCameraPositions() {
   const pts = [
-    [0, 104, 320],
-    [0, 68, 238],
+    [0, 122, 340],
+    [0, 74, 248],
   ];
   for (let i = 0; i < CABIN_COUNT; i++) {
     const a = cabinAngle(i);
-    pts.push([Math.cos(a) * 214, 38, Math.sin(a) * 214]);
-    pts.push([Math.cos(a + 0.18) * 184, 28, Math.sin(a + 0.18) * 184]);
+    pts.push([Math.cos(a - 0.28) * 210, 42, Math.sin(a - 0.28) * 210]);
+    pts.push([Math.cos(a - 0.08) * 178, 30, Math.sin(a - 0.08) * 178]);
+    pts.push([Math.cos(a + 0.14) * 190, 34, Math.sin(a + 0.14) * 190]);
   }
   pts.push([0, 122, 230], [0, 240, 92], [0, 310, 0]);
   return pts;
@@ -515,8 +526,10 @@ function buildCameraTargets() {
   ];
   for (let i = 0; i < CABIN_COUNT; i++) {
     const p = cabinPoint(i, 134, 17);
+    const lead = cabinPoint(i, 118, 28);
     pts.push([p.x, p.y, p.z]);
-    pts.push([p.x, p.y + 6, p.z]);
+    pts.push([lead.x, lead.y, lead.z]);
+    pts.push([p.x, p.y + 8, p.z]);
   }
   pts.push([0, 16, 0], [0, 0, 0], [0, 0, 0]);
   return pts;
@@ -525,6 +538,7 @@ function buildCameraTargets() {
 buildEnvironment();
 const capsules = buildCapsules();
 const starField = buildParticles();
+const sparkleField = buildSparkles();
 const bookSprites = buildBookSprites();
 wireControls();
 applyLanguage("zh");
@@ -570,7 +584,7 @@ function buildEnvironment() {
   root.add(tailRing);
 
   const dome = new THREE.Mesh(
-    new THREE.SphereGeometry(238, 80, 28, 0, Math.PI * 2, 0, Math.PI / 2),
+    new THREE.SphereGeometry(282, 96, 32, 0, Math.PI * 2, 0, Math.PI / 2.18),
     new THREE.MeshPhysicalMaterial({
       color: "#b9d1e4",
       roughness: 0.16,
@@ -581,14 +595,15 @@ function buildEnvironment() {
     })
   );
   dome.name = "dome-shell";
-  dome.position.y = -1.5;
+  dome.position.y = -8;
+  dome.scale.y = 0.82;
   root.add(dome);
 
-  const ribMat = new THREE.LineBasicMaterial({ color: "#6e879b", transparent: true, opacity: 0.34 });
+  const ribMat = new THREE.LineBasicMaterial({ color: "#6e879b", transparent: true, opacity: 0.28 });
   ribMat.name = "rib-line";
   for (let i = 0; i < 24; i++) {
-    const curve = new THREE.EllipseCurve(0, 0, 238, 238, 0, Math.PI, false);
-    const pts = curve.getPoints(72).map((p) => new THREE.Vector3(p.x, p.y - 1.5, 0));
+    const curve = new THREE.EllipseCurve(0, 0, 282, 232, 0, Math.PI, false);
+    const pts = curve.getPoints(80).map((p) => new THREE.Vector3(p.x, p.y - 8, 0));
     const geo = new THREE.BufferGeometry().setFromPoints(pts);
     const line = new THREE.Line(geo, ribMat);
     line.rotation.y = (i / 24) * Math.PI * 2;
@@ -695,6 +710,65 @@ function buildParticles() {
   return points;
 }
 
+function makeSparkTexture(kind) {
+  const c = document.createElement("canvas");
+  c.width = 96;
+  c.height = 96;
+  const ctx = c.getContext("2d");
+  ctx.clearRect(0, 0, 96, 96);
+  const g = ctx.createRadialGradient(48, 48, 0, 48, 48, 46);
+  g.addColorStop(0, "rgba(255,255,255,1)");
+  g.addColorStop(0.38, "rgba(120,220,255,.7)");
+  g.addColorStop(1, "rgba(120,220,255,0)");
+  ctx.fillStyle = g;
+  if (kind === "star") {
+    ctx.beginPath();
+    ctx.moveTo(48, 4);
+    ctx.lineTo(58, 38);
+    ctx.lineTo(92, 48);
+    ctx.lineTo(58, 58);
+    ctx.lineTo(48, 92);
+    ctx.lineTo(38, 58);
+    ctx.lineTo(4, 48);
+    ctx.lineTo(38, 38);
+    ctx.closePath();
+    ctx.fill();
+  } else {
+    ctx.beginPath();
+    ctx.arc(48, 48, kind === "square" ? 18 : 24, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+function buildSparkles() {
+  const group = new THREE.Group();
+  const textures = [makeSparkTexture("dot"), makeSparkTexture("star"), makeSparkTexture("square")];
+  for (let i = 0; i < 90; i++) {
+    const mat = new THREE.SpriteMaterial({
+      map: textures[i % textures.length],
+      transparent: true,
+      opacity: i % 3 === 1 ? 0.38 : 0.28,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      color: i % 4 === 0 ? "#ffe7a8" : "#95ddff",
+    });
+    const s = new THREE.Sprite(mat);
+    const a = Math.random() * Math.PI * 2;
+    const r = 60 + Math.random() * 210;
+    s.position.set(Math.cos(a) * r, 20 + Math.random() * 150, Math.sin(a) * r);
+    const size = 2.2 + Math.random() * 5.2;
+    s.scale.set(size, size, 1);
+    s.userData.phase = Math.random() * Math.PI * 2;
+    s.userData.baseOpacity = mat.opacity;
+    group.add(s);
+  }
+  root.add(group);
+  return group;
+}
+
 function buildBookSprites() {
   const group = new THREE.Group();
   const items = cabinBooks.map((book, i) => {
@@ -749,6 +823,7 @@ function applyLanguage(next) {
   document.body.dataset.lang = language;
   els.navOverview.textContent = copy.navOverview;
   els.navStory.textContent = copy.navStory;
+  els.brand.textContent = copy.brand;
   els.introEyebrow.textContent = copy.introEyebrow;
   els.introTitle.textContent = copy.introTitle;
   els.introBody.textContent = copy.introBody;
@@ -756,6 +831,7 @@ function applyLanguage(next) {
   els.archiveTitle.textContent = copy.archiveTitle;
   els.archiveLead.textContent = copy.archiveLead;
   els.graphTip.textContent = copy.graphTip;
+  els.footerCopy.textContent = copy.footerCopy;
   els.bookLink.textContent = copy.enter;
   els.finalViewButtons.forEach((btn, i) => {
     btn.textContent = copy.views[i];
@@ -981,15 +1057,25 @@ function setupGraph() {
     node.vy = 0;
   });
   relaxGraph(260);
-  storyEls.graph.addEventListener("mousemove", onGraphMove);
+  storyEls.graph.addEventListener("pointerdown", onGraphPointerDown);
+  storyEls.graph.addEventListener("pointermove", onGraphPointerMove);
+  storyEls.graph.addEventListener("pointercancel", onGraphPointerUp);
   storyEls.graph.addEventListener("mouseleave", () => {
+    if (graphDraggingNode || graphPanning) return;
     hoveredGraphNode = null;
     drawRelationGraph();
   });
+  window.addEventListener("pointerup", onGraphPointerUp);
   storyEls.graph.addEventListener("click", onGraphClick);
   storyEls.graph.addEventListener("wheel", (ev) => {
     ev.preventDefault();
+    ev.stopPropagation();
+    const rect = storyEls.graph.getBoundingClientRect();
+    const before = graphScreenToWorld(ev.clientX - rect.left, ev.clientY - rect.top, rect);
     graphCamera.k = clamp(graphCamera.k * (ev.deltaY < 0 ? 1.12 : 0.9), 0.55, 2.8);
+    const after = graphScreenToWorld(ev.clientX - rect.left, ev.clientY - rect.top, rect);
+    graphCamera.x += before.x - after.x;
+    graphCamera.y += before.y - after.y;
     drawRelationGraph();
   }, { passive: false });
   refreshGraphChips();
@@ -1063,6 +1149,13 @@ function graphToScreen(node, rect) {
   };
 }
 
+function graphScreenToWorld(x, y, rect) {
+  return {
+    x: (x - rect.width / 2) / graphCamera.k + graphCamera.x,
+    y: (y - rect.height / 2) / graphCamera.k + graphCamera.y,
+  };
+}
+
 function pickGraphNode(ev) {
   const rect = storyEls.graph.getBoundingClientRect();
   const x = ev.clientX - rect.left;
@@ -1081,13 +1174,75 @@ function pickGraphNode(ev) {
   return best;
 }
 
-function onGraphMove(ev) {
+function onGraphPointerDown(ev) {
+  if (ev.button !== undefined && ev.button !== 0) return;
+  ev.preventDefault();
+  ev.stopPropagation();
+  graphPointerMoved = false;
+  graphLastPointer = { x: ev.clientX, y: ev.clientY };
+  const picked = pickGraphNode(ev);
+  if (picked) {
+    graphDraggingNode = picked;
+    selectedGraphNode = picked;
+    hoveredGraphNode = picked;
+  } else {
+    graphPanning = true;
+    hoveredGraphNode = null;
+  }
+  storyEls.graph.setPointerCapture?.(ev.pointerId);
+  storyEls.graph.style.cursor = "grabbing";
+  drawRelationGraph();
+}
+
+function onGraphPointerMove(ev) {
+  const rect = storyEls.graph.getBoundingClientRect();
+  if (graphLastPointer) {
+    const dx = ev.clientX - graphLastPointer.x;
+    const dy = ev.clientY - graphLastPointer.y;
+    if (Math.hypot(dx, dy) > 3) graphPointerMoved = true;
+
+    if (graphDraggingNode) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      const p = graphScreenToWorld(ev.clientX - rect.left, ev.clientY - rect.top, rect);
+      graphDraggingNode.x = p.x;
+      graphDraggingNode.y = p.y;
+      graphLastPointer = { x: ev.clientX, y: ev.clientY };
+      drawRelationGraph();
+      return;
+    }
+
+    if (graphPanning) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      graphCamera.x -= dx / graphCamera.k;
+      graphCamera.y -= dy / graphCamera.k;
+      graphLastPointer = { x: ev.clientX, y: ev.clientY };
+      drawRelationGraph();
+      return;
+    }
+  }
+
   hoveredGraphNode = pickGraphNode(ev);
-  storyEls.graph.style.cursor = hoveredGraphNode ? "pointer" : "crosshair";
+  storyEls.graph.style.cursor = hoveredGraphNode ? "grab" : "grab";
+  drawRelationGraph();
+}
+
+function onGraphPointerUp(ev) {
+  if (!graphDraggingNode && !graphPanning) return;
+  graphDraggingNode = null;
+  graphPanning = false;
+  graphLastPointer = null;
+  storyEls.graph.releasePointerCapture?.(ev.pointerId);
+  storyEls.graph.style.cursor = hoveredGraphNode ? "grab" : "grab";
   drawRelationGraph();
 }
 
 function onGraphClick(ev) {
+  if (graphPointerMoved) {
+    graphPointerMoved = false;
+    return;
+  }
   selectedGraphNode = pickGraphNode(ev);
   if (!selectedGraphNode) return;
   const meta = graphTypes[selectedGraphNode.type];
@@ -1198,17 +1353,17 @@ function fadeWindow(p, start, end) {
 
 function updateDom(p) {
   railDot.style.top = `${p * 100}%`;
-  const introOpacity = fadeWindow(p, 0, 0.14);
+  const introOpacity = fadeWindow(p, 0, 0.105);
   intro.classList.toggle("is-visible", introOpacity > 0.02);
   intro.style.opacity = introOpacity.toFixed(3);
-  const panelOpacity = fadeWindow(p, 0.16, 0.78);
+  const panelOpacity = fadeWindow(p, 0.11, 0.78);
   panel.classList.toggle("is-visible", panelOpacity > 0.02);
   panel.style.opacity = panelOpacity.toFixed(3);
   panel.style.transform = `translate(-50%, ${-42 + (1 - panelOpacity) * 4}%)`;
   overview.classList.toggle("is-visible", p >= 0.82);
 
-  if (p >= 0.16 && p < 0.78) {
-    const local = (p - 0.16) / 0.62;
+  if (p >= 0.11 && p < 0.78) {
+    const local = (p - 0.11) / 0.67;
     setActiveBook(clamp(Math.floor(local * cabinBooks.length), 0, cabinBooks.length - 1));
   } else if (p < 0.16) {
     setActiveBook(-1);
@@ -1228,6 +1383,12 @@ function updateScene(dt, elapsed) {
 
   root.rotation.y = Math.sin(elapsed * 0.08) * 0.012;
   starField.rotation.y += dt * 0.012;
+  starField.material.opacity = mode === "night" ? 0.64 : 0.2;
+  sparkleField.rotation.y -= dt * 0.008;
+  sparkleField.children.forEach((sprite, i) => {
+    const nightBoost = mode === "night" ? 1 : 0.28;
+    sprite.material.opacity = sprite.userData.baseOpacity * nightBoost * (0.72 + 0.28 * Math.sin(elapsed * 1.4 + sprite.userData.phase + i));
+  });
   coolLight.intensity = (mode === "day" ? 30 : 42) + Math.sin(elapsed * 1.2) * 4;
   warmLight.intensity = mode === "day" ? 12 : 18;
   capsules.forEach((item, i) => {
@@ -1240,7 +1401,7 @@ function updateScene(dt, elapsed) {
     }
   });
   bookSprites.forEach((sprite, i) => {
-    const active = activeBook === i && progress > 0.17 && progress < 0.78;
+    const active = activeBook === i && progress > 0.12 && progress < 0.78;
     sprite.visible = true;
     sprite.material.opacity += ((active ? 1 : 0.62) - sprite.material.opacity) * Math.min(1, dt * 4.5);
     const base = sprite.userData.base;
@@ -1266,6 +1427,7 @@ function onScroll() {
 
 function onWheel(ev) {
   if (ev.ctrlKey) return;
+  if (ev.target?.closest?.(".graph-wrap")) return;
   ev.preventDefault();
   const factor = ev.deltaMode === 1 ? 33 : ev.deltaMode === 2 ? window.innerHeight : 1;
   scrollStage.scrollTop += ev.deltaY * factor;

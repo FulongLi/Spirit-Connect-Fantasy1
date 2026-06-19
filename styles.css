@@ -207,10 +207,12 @@ body[data-theme="night"] .rail {
 }
 
 .chapter-intro {
-  top: 16vh;
-  left: clamp(22px, 8vw, 110px);
-  width: min(630px, calc(100vw - 44px));
+  top: 50%;
+  left: 50%;
+  width: min(720px, calc(100vw - 44px));
+  transform: translate(-50%, -52%);
   color: #172033;
+  text-align: center;
   text-shadow: 0 1px 18px rgba(255, 255, 255, 0.92);
 }
 
@@ -232,6 +234,7 @@ body[data-theme="night"] .eyebrow {
 h1,
 h2 {
   margin: 0;
+  margin-inline: auto;
   max-width: 13ch;
   font-weight: 800;
   letter-spacing: 0;
@@ -249,6 +252,8 @@ h2 {
 
 .chapter p:not(.eyebrow),
 .overview-lead {
+  margin-left: auto;
+  margin-right: auto;
   max-width: 650px;
   color: var(--muted);
   font-size: clamp(15px, 1.5vw, 18px);
@@ -360,7 +365,7 @@ body[data-theme="night"] .primary-link {
   z-index: 5;
   display: grid;
   place-items: center;
-  padding: 76px clamp(18px, 4vw, 58px) 34px;
+  padding: 76px clamp(18px, 4vw, 58px) 56px;
   opacity: 0;
   visibility: hidden;
   transform: translateY(18px);
@@ -372,6 +377,35 @@ body[data-theme="night"] .primary-link {
     linear-gradient(180deg, rgba(241, 247, 252, 0.82), rgba(219, 231, 242, 0.94)),
     radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.98), transparent 40%);
   backdrop-filter: blur(16px);
+}
+
+.site-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 34px;
+  padding: 8px clamp(18px, 4vw, 54px);
+  border-top: 1px solid rgba(58, 56, 54, 0.78);
+  background: rgba(8, 8, 8, 0.88);
+  color: rgba(245, 242, 237, 0.42);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-align: center;
+  text-transform: uppercase;
+  backdrop-filter: blur(14px);
+  pointer-events: none;
+}
+
+body[data-theme="day"] .site-footer {
+  border-top-color: rgba(72, 69, 62, 0.28);
+  background: rgba(32, 31, 29, 0.82);
+  color: rgba(245, 242, 237, 0.52);
 }
 
 body[data-theme="night"] .overview {
@@ -586,7 +620,9 @@ body[data-theme="day"] .story-canvas {
   display: block;
   width: 100%;
   height: 430px;
-  cursor: crosshair;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
 }
 
 .graph-chips {
