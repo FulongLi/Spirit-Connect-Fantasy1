@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spirit Connect Fantasy Archives</title>
+    <meta
+      name="description"
+      content="Spirit Connect Fantasy 小说档案的沉浸式展示原型。"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <canvas id="scene" aria-label="Spirit Connect Fantasy 环形档案舱场景"></canvas>
+
+    <main id="scroll-stage">
+      <div class="scroll-space"></div>
+    </main>
+
+    <header class="topbar">
+      <div class="brand">SPIRIT CONNECT FANTASY</div>
+      <nav class="nav">
+        <a href="#archive-grid">档案总览</a>
+        <a href="fantasy-content/zh/anotherworld/storylines.md">故事线</a>
+      </nav>
+    </header>
+
+    <div class="rail" aria-hidden="true">
+      <div class="rail-dot" id="rail-dot"></div>
+    </div>
+
+    <section class="chapter chapter-intro is-visible" data-chapter="intro">
+      <p class="eyebrow">另一个世界 · 叙事档案馆</p>
+      <h1>十二座灵接舱，十二本未醒来的书。</h1>
+      <p>
+        这里把 Spirit Connect Fantasy 的小说设定整理成一个可漫游的白色档案空间：
+        镜头会从中央环形大厅进入每一座舱，展示书卷封面、核心概念与后续阅读入口。
+      </p>
+    </section>
+
+    <section class="chapter book-panel" data-book-panel>
+      <div class="book-cover" id="book-cover">
+        <span id="book-glyph">月</span>
+      </div>
+      <div class="book-copy">
+        <p class="eyebrow" id="book-kicker">档案 I · 第一扇门</p>
+        <h2 id="book-title">月球暗面</h2>
+        <p id="book-description"></p>
+        <div class="meta-row">
+          <span id="book-status"></span>
+          <span id="book-theme"></span>
+        </div>
+        <a class="primary-link" id="book-link" href="#">进入小说档案</a>
+      </div>
+    </section>
+
+    <section class="overview" id="archive-grid" aria-labelledby="archive-title">
+      <div class="overview-inner">
+        <p class="eyebrow">ARCHIVE INDEX</p>
+        <h2 id="archive-title">Spirit Connect Fantasy 书卷序列</h2>
+        <p class="overview-lead">
+          先放入前三卷的明确入口，其余九座舱作为未来卷宗预留。后续你补正文、封面或章节时，
+          直接扩展数据即可让镜头继续接入。
+        </p>
+        <div class="archive-grid" id="archive-list"></div>
+      </div>
+    </section>
+
+    <script src="app.js"></script>
+  </body>
+</html>
