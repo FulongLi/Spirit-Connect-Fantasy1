@@ -140,19 +140,20 @@ const reserved = [
 
 const uiText = {
   zh: {
+    title: "灵接幻想档案",
     htmlLang: "zh-CN",
     navOverview: "档案总览",
     navStory: "故事线",
-    brand: "临界幻想",
+    brand: "灵接幻想",
     day: "白天",
     night: "夜间",
     enter: "进入小说档案",
     introEyebrow: "另一个世界 · 叙事档案馆",
-    introTitle: "临界幻想",
+    introTitle: "灵接幻想",
     introBody:
       "六座灵接舱，六本正在醒来的书。镜头会从中央环形大厅进入每一座舱，展示书卷封面、核心概念与后续阅读入口。",
     archiveEyebrow: "档案索引",
-    archiveTitle: "书卷序列",
+    archiveTitle: "灵接幻想书卷序列",
     archiveLead:
       "已挂入现有封面资源；英文封面暂缺的书卷会先使用中文封面，之后你替换文件即可继续扩展。",
     views: ["书卷总览", "故事线", "关系图谱"],
@@ -160,11 +161,12 @@ const uiText = {
     storyHint: "故事线正在生成……点击任意节点查看事件。",
     graphHint: "点击节点查看说明；悬停可高亮它的所有连接。",
     mainLine: "主线",
-    footerCopy: "© 2026 临界幻想。版权所有。",
+    footerCopy: "© 2026 灵接幻想。版权所有。",
     reservedPrefix: "预留舱",
     reservedText: "后续卷宗入口预留。",
   },
   en: {
+    title: "Spirit Connect Fantasy Archives",
     htmlLang: "en",
     navOverview: "Archive",
     navStory: "Storylines",
@@ -310,10 +312,10 @@ const graphLinks = [["b1","jim"],["b1","e2118"],["b1","elara"],["b1","terasa"],[
 
 const themes = {
   day: {
-    bg: "#e7dfd0",
-    fog: "#ddd4c4",
-    fogNear: 120,
-    fogFar: 460,
+    bg: "#ece5d8",
+    fog: "#eee7dc",
+    fogNear: 230,
+    fogFar: 760,
     floor: "#c9c0b0",
     shell: "#b9c0c6",
     pearl: "#8e9aa5",
@@ -322,10 +324,10 @@ const themes = {
     rail: "#66717a",
     hemiSky: "#f8f1e5",
     hemiGround: "#5d6570",
-    hemiIntensity: 0.95,
-    keyIntensity: 2.35,
-    env: 0.32,
-    bloom: 0.5,
+    hemiIntensity: 1.08,
+    keyIntensity: 2.55,
+    env: 0.38,
+    bloom: 0.42,
   },
   night: {
     bg: "#04080f",
@@ -409,6 +411,9 @@ let hoveredGraphNode = null;
 let graphInitialized = false;
 let graphHiddenTypes = {};
 let graphCamera = { x: 0, y: 0, k: 1 };
+let graphAlpha = 1;
+let graphLinksResolved = [];
+let graphNeighbors = {};
 let graphDraggingNode = null;
 let graphPanning = false;
 let graphLastPointer = null;
@@ -822,6 +827,7 @@ function wireControls() {
 function applyLanguage(next) {
   language = next;
   const copy = uiText[language];
+  document.title = copy.title;
   document.documentElement.lang = copy.htmlLang;
   document.body.dataset.lang = language;
   els.navOverview.textContent = copy.navOverview;
@@ -927,6 +933,11 @@ function storyNodeText(node) {
   return { t: pair[0], d: pair[1] };
 }
 
+function getStoryCover(book) {
+  const source = book.id === "moon" ? books[0] : book.id === "whale" ? books[1] : books.find((item) => item.title.zh === book.title.zh);
+  return source ? getCover(source) : "";
+}
+
 function buildStoryline() {
   if (!storyEls.list || !storyEls.canvas) return;
   const copy = uiText[language];
@@ -936,8 +947,9 @@ function buildStoryline() {
     button.type = "button";
     button.className = `story-book ${book === selectedStoryBook ? "is-active" : ""}`;
     button.style.color = book.accent;
+    const storyCover = getStoryCover(book);
     button.innerHTML = `
-      <span class="story-book-glyph">${book.glyph}</span>
+      <span class="story-book-cover" style="background-image:url('${storyCover}')"></span>
       <span><strong>${book.title[language] || book.title.zh}</strong><span>${book.subtitle[language] || book.subtitle.zh} · ${book.status[language] || book.status.zh}</span></span>
     `;
     button.addEventListener("click", () => {
@@ -1052,14 +1064,28 @@ function setupGraph() {
   graphInitialized = true;
   const golden = Math.PI * (3 - Math.sqrt(5));
   graphNodes.forEach((node, i) => {
-    const r = 42 + Math.sqrt(i) * 26;
+    const r = 60 + Math.sqrt(i) * 14;
     const a = i * golden;
     node.x = Math.cos(a) * r;
     node.y = Math.sin(a) * r;
     node.vx = 0;
     node.vy = 0;
+    node.fixed = false;
+    node.r = node.type === "book" ? 15 : node.type === "character" ? 9.5 : 7.5;
   });
-  relaxGraph(260);
+  const byId = Object.fromEntries(graphNodes.map((node) => [node.id, node]));
+  graphLinksResolved = graphLinks.map(([a, b]) => ({ a: byId[a], b: byId[b] })).filter((link) => link.a && link.b);
+  graphNeighbors = Object.fromEntries(graphNodes.map((node) => [node.id, {}]));
+  graphLinksResolved.forEach((link) => {
+    graphNeighbors[link.a.id][link.b.id] = true;
+    graphNeighbors[link.b.id][link.a.id] = true;
+  });
+  graphNodes.forEach((node) => {
+    node.r += Math.min(4, Object.keys(graphNeighbors[node.id]).length * 0.35);
+  });
+  graphAlpha = 1;
+  for (let i = 0; i < 220; i++) stepGraphPhysics();
+  graphAlpha = 0.4;
   storyEls.graph.addEventListener("pointerdown", onGraphPointerDown);
   storyEls.graph.addEventListener("pointermove", onGraphPointerMove);
   storyEls.graph.addEventListener("pointercancel", onGraphPointerUp);
@@ -1071,6 +1097,14 @@ function setupGraph() {
   window.addEventListener("pointerup", onGraphPointerUp);
   storyEls.graph.addEventListener("click", onGraphClick);
   storyEls.graph.addEventListener("wheel", (ev) => {
+    if (overview.classList.contains("is-visible") && overview.scrollTop <= 1 && ev.deltaY < 0) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      const factor = ev.deltaMode === 1 ? 33 : ev.deltaMode === 2 ? window.innerHeight : 1;
+      scrollStage.scrollTop += ev.deltaY * factor;
+      onScroll();
+      return;
+    }
     ev.preventDefault();
     ev.stopPropagation();
     const rect = storyEls.graph.getBoundingClientRect();
@@ -1094,6 +1128,7 @@ function refreshGraphChips() {
     button.innerHTML = `<span class="graph-chip-dot" style="background:${meta.color}"></span>${meta[language]}`;
     button.addEventListener("click", () => {
       graphHiddenTypes[type] = !graphHiddenTypes[type];
+      reheatGraph();
       refreshGraphChips();
       drawRelationGraph();
     });
@@ -1101,54 +1136,78 @@ function refreshGraphChips() {
   });
 }
 
-function relaxGraph(iterations) {
-  const byId = Object.fromEntries(graphNodes.map((node) => [node.id, node]));
-  const links = graphLinks.map(([a, b]) => [byId[a], byId[b]]).filter(([a, b]) => a && b);
-  for (let step = 0; step < iterations; step++) {
-    for (let i = 0; i < graphNodes.length; i++) {
-      for (let j = i + 1; j < graphNodes.length; j++) {
-        const a = graphNodes[i];
-        const b = graphNodes[j];
-        let dx = a.x - b.x;
-        let dy = a.y - b.y;
-        const d2 = dx * dx + dy * dy + 0.01;
-        const f = 650 / d2;
-        const d = Math.sqrt(d2);
-        dx /= d;
-        dy /= d;
-        a.vx += dx * f;
-        a.vy += dy * f;
-        b.vx -= dx * f;
-        b.vy -= dy * f;
-      }
-    }
-    links.forEach(([a, b]) => {
-      let dx = b.x - a.x;
-      let dy = b.y - a.y;
-      const d = Math.sqrt(dx * dx + dy * dy) + 0.01;
-      const f = (d - 112) * 0.012;
+function visibleGraphNode(node) {
+  return !graphHiddenTypes[node.type];
+}
+
+function graphDegree(node) {
+  return Object.keys(graphNeighbors[node.id] || {}).length;
+}
+
+function reheatGraph() {
+  graphAlpha = Math.max(graphAlpha, 0.6);
+}
+
+function stepGraphPhysics() {
+  for (let i = 0; i < graphNodes.length; i++) {
+    const a = graphNodes[i];
+    if (!visibleGraphNode(a)) continue;
+    for (let j = i + 1; j < graphNodes.length; j++) {
+      const b = graphNodes[j];
+      if (!visibleGraphNode(b)) continue;
+      let dx = a.x - b.x;
+      let dy = a.y - b.y;
+      const d2 = dx * dx + dy * dy + 0.01;
+      if (d2 > 90000) continue;
+      const d = Math.sqrt(d2);
+      const f = 1300 / d2;
       dx /= d;
       dy /= d;
       a.vx += dx * f;
       a.vy += dy * f;
       b.vx -= dx * f;
       b.vy -= dy * f;
-    });
-    graphNodes.forEach((node) => {
-      node.vx -= node.x * 0.004;
-      node.vy -= node.y * 0.004;
-      node.x += node.vx;
-      node.y += node.vy;
-      node.vx *= 0.78;
-      node.vy *= 0.78;
-    });
+    }
   }
+
+  graphLinksResolved.forEach((link) => {
+    if (!visibleGraphNode(link.a) || !visibleGraphNode(link.b)) return;
+    let dx = link.b.x - link.a.x;
+    let dy = link.b.y - link.a.y;
+    const d = Math.sqrt(dx * dx + dy * dy) + 0.01;
+    const target = 95 + (link.a.r + link.b.r) * 1.6;
+    const f = (d - target) * 0.012;
+    dx /= d;
+    dy /= d;
+    const spring = dx * f * d * 0.02 + dx * f;
+    const springY = dy * f * d * 0.02 + dy * f;
+    link.a.vx += spring;
+    link.a.vy += springY;
+    link.b.vx -= spring;
+    link.b.vy -= springY;
+  });
+
+  graphNodes.forEach((node) => {
+    if (!visibleGraphNode(node)) return;
+    node.vx -= node.x * 0.004;
+    node.vy -= node.y * 0.004;
+    if (!node.fixed) {
+      node.vx *= 0.86;
+      node.vy *= 0.86;
+      node.x += node.vx * graphAlpha;
+      node.y += node.vy * graphAlpha;
+    } else {
+      node.vx = 0;
+      node.vy = 0;
+    }
+  });
+  graphAlpha = Math.max(0.06, graphAlpha * 0.985);
 }
 
 function graphToScreen(node, rect) {
   return {
-    x: rect.width / 2 + ((node.rx ?? node.x) - graphCamera.x) * graphCamera.k,
-    y: rect.height / 2 + ((node.ry ?? node.y) - graphCamera.y) * graphCamera.k,
+    x: rect.width / 2 + (node.x - graphCamera.x) * graphCamera.k,
+    y: rect.height / 2 + (node.y - graphCamera.y) * graphCamera.k,
   };
 }
 
@@ -1161,40 +1220,21 @@ function graphScreenToWorld(x, y, rect) {
 
 function pickGraphNode(ev) {
   const rect = storyEls.graph.getBoundingClientRect();
-  const x = ev.clientX - rect.left;
-  const y = ev.clientY - rect.top;
+  const world = graphScreenToWorld(ev.clientX - rect.left, ev.clientY - rect.top, rect);
   let best = null;
   let bestD = Infinity;
   graphNodes.forEach((node) => {
-    if (graphHiddenTypes[node.type]) return;
-    const p = graphToScreen(node, rect);
-    const d = Math.hypot(p.x - x, p.y - y);
-    if (d < Math.max(11, node.type === "book" ? 17 : 12) && d < bestD) {
+    if (!visibleGraphNode(node)) return;
+    const dx = node.x - world.x;
+    const dy = node.y - world.y;
+    const d = dx * dx + dy * dy;
+    const hit = node.r + 6;
+    if (d < hit * hit && d < bestD) {
       best = node;
       bestD = d;
     }
   });
   return best;
-}
-
-function applyGraphHoverMotion(focus, linked) {
-  const t = performance.now() * 0.0028;
-  graphNodes.forEach((node, i) => {
-    let tx = node.x;
-    let ty = node.y;
-    if (focus && node !== focus && linked.has(node.id)) {
-      let dx = node.x - focus.x;
-      let dy = node.y - focus.y;
-      const d = Math.hypot(dx, dy) || 1;
-      dx /= d;
-      dy /= d;
-      const wave = 9 + Math.sin(t + i * 0.9) * 4;
-      tx += dx * wave;
-      ty += dy * wave;
-    }
-    node.rx = (node.rx ?? node.x) + (tx - (node.rx ?? node.x)) * 0.2;
-    node.ry = (node.ry ?? node.y) + (ty - (node.ry ?? node.y)) * 0.2;
-  });
 }
 
 function onGraphPointerDown(ev) {
@@ -1206,7 +1246,7 @@ function onGraphPointerDown(ev) {
   const picked = pickGraphNode(ev);
   if (picked) {
     graphDraggingNode = picked;
-    selectedGraphNode = picked;
+    picked.fixed = true;
     hoveredGraphNode = picked;
   } else {
     graphPanning = true;
@@ -1230,6 +1270,7 @@ function onGraphPointerMove(ev) {
       const p = graphScreenToWorld(ev.clientX - rect.left, ev.clientY - rect.top, rect);
       graphDraggingNode.x = p.x;
       graphDraggingNode.y = p.y;
+      reheatGraph();
       graphLastPointer = { x: ev.clientX, y: ev.clientY };
       drawRelationGraph();
       return;
@@ -1253,6 +1294,11 @@ function onGraphPointerMove(ev) {
 
 function onGraphPointerUp(ev) {
   if (!graphDraggingNode && !graphPanning) return;
+  if (graphDraggingNode) {
+    if (!graphPointerMoved) selectGraphNode(graphDraggingNode);
+    graphDraggingNode.fixed = false;
+    reheatGraph();
+  }
   graphDraggingNode = null;
   graphPanning = false;
   graphLastPointer = null;
@@ -1266,6 +1312,10 @@ function onGraphClick(ev) {
     graphPointerMoved = false;
     return;
   }
+  const picked = pickGraphNode(ev);
+  if (!picked) return;
+  selectGraphNode(picked);
+  return;
   selectedGraphNode = pickGraphNode(ev);
   if (!selectedGraphNode) return;
   const meta = graphTypes[selectedGraphNode.type];
@@ -1274,6 +1324,18 @@ function onGraphClick(ev) {
     <span class="story-detail-meta" style="color:${meta.color}">${meta[language]} · ${count}</span>
     <h3>${selectedGraphNode.label[language]}</h3>
     <p>${selectedGraphNode.d[language]}</p>
+  `;
+  drawRelationGraph();
+}
+
+function selectGraphNode(node) {
+  selectedGraphNode = node;
+  const meta = graphTypes[node.type];
+  const count = graphDegree(node);
+  storyEls.graphDetail.innerHTML = `
+    <span class="story-detail-meta" style="color:${meta.color}">${meta[language]} · ${count}</span>
+    <h3>${node.label[language]}</h3>
+    <p>${node.d[language]}</p>
   `;
   drawRelationGraph();
 }
@@ -1290,22 +1352,15 @@ function drawRelationGraph() {
   const ctx = canvas.getContext("2d");
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, rect.width, rect.height);
-  const byId = Object.fromEntries(graphNodes.map((node) => [node.id, node]));
   const focus = hoveredGraphNode || selectedGraphNode;
   const linked = new Set();
   if (focus) {
     linked.add(focus.id);
-    graphLinks.forEach(([a, b]) => {
-      if (a === focus.id) linked.add(b);
-      if (b === focus.id) linked.add(a);
-    });
+    Object.keys(graphNeighbors[focus.id] || {}).forEach((id) => linked.add(id));
   }
-  applyGraphHoverMotion(focus, linked);
 
-  graphLinks.forEach(([aId, bId]) => {
-    const a = byId[aId];
-    const b = byId[bId];
-    if (!a || !b || graphHiddenTypes[a.type] || graphHiddenTypes[b.type]) return;
+  graphLinksResolved.forEach(({ a, b }) => {
+    if (!a || !b || !visibleGraphNode(a) || !visibleGraphNode(b)) return;
     const pa = graphToScreen(a, rect);
     const pb = graphToScreen(b, rect);
     const hot = focus && (a.id === focus.id || b.id === focus.id);
@@ -1318,11 +1373,11 @@ function drawRelationGraph() {
   });
 
   graphNodes.forEach((node) => {
-    if (graphHiddenTypes[node.type]) return;
+    if (!visibleGraphNode(node)) return;
     const p = graphToScreen(node, rect);
     const meta = graphTypes[node.type];
     const hot = !focus || linked.has(node.id);
-    const r = node.type === "book" ? 13 : node.type === "character" ? 9 : 7;
+    const r = node.r * graphCamera.k;
     ctx.globalAlpha = hot ? 1 : 0.14;
     ctx.shadowColor = meta.color;
     ctx.shadowBlur = node === focus || node === selectedGraphNode ? 22 : 10;
@@ -1467,6 +1522,17 @@ function onWheel(ev) {
   onScroll();
 }
 
+function onOverviewWheel(ev) {
+  if (!overview.classList.contains("is-visible")) return;
+  const factor = ev.deltaMode === 1 ? 33 : ev.deltaMode === 2 ? window.innerHeight : 1;
+  const atTop = overview.scrollTop <= 1;
+  if (ev.deltaY < 0 && atTop) {
+    ev.preventDefault();
+    scrollStage.scrollTop += ev.deltaY * factor;
+    onScroll();
+  }
+}
+
 function onResize() {
   const w = window.innerWidth;
   const h = window.innerHeight;
@@ -1486,6 +1552,7 @@ window.addEventListener("pointermove", (ev) => {
   pointerY = (ev.clientY / window.innerHeight - 0.5) * 2;
 });
 scrollStage.addEventListener("scroll", onScroll, { passive: true });
+overview.addEventListener("wheel", onOverviewWheel, { passive: false });
 
 function animate() {
   const dt = Math.min(clock.getDelta(), 0.05);
@@ -1494,7 +1561,8 @@ function animate() {
   progress += (progressTarget - progress) * Math.min(1, dt * 1.75);
   updateDom(progress);
   updateScene(dt, elapsed);
-  if (hoveredGraphNode && document.getElementById("final-graph")?.classList.contains("is-active")) {
+  if (document.getElementById("final-graph")?.classList.contains("is-active")) {
+    if (graphAlpha > 0.061 || graphDraggingNode) stepGraphPhysics();
     drawRelationGraph();
   }
   composer.render();

@@ -512,14 +512,16 @@ body[data-theme="night"] .graph-chip {
   text-align: left;
 }
 
-.story-book-glyph {
-  display: grid;
-  place-items: center;
+.story-book-cover {
+  display: block;
   width: 42px;
   aspect-ratio: 0.72;
   border: 1px solid currentColor;
   border-radius: 6px;
-  font-weight: 900;
+  background-color: rgba(8, 18, 32, 0.72);
+  background-position: center;
+  background-size: cover;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24);
 }
 
 .story-book strong {
