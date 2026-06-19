@@ -128,6 +128,9 @@ const books = [
   },
 ];
 
+const CABIN_COUNT = 6;
+const cabinBooks = books.slice(0, CABIN_COUNT);
+
 const reserved = [
   { zh: "数字吉姆", en: "Digital Jim" },
   { zh: "泰拉撒记录", en: "Terasa Records" },
@@ -151,6 +154,11 @@ const uiText = {
     archiveTitle: "Spirit Connect Fantasy 书卷序列",
     archiveLead:
       "已挂入现有封面资源；英文封面暂缺的书卷会先使用中文封面，之后你替换文件即可继续扩展。",
+    views: ["书卷总览", "故事线", "关系图谱"],
+    graphTip: "拖拽视图 · 悬停高亮 · 点击节点查看说明",
+    storyHint: "故事线正在生成……点击任意节点查看事件。",
+    graphHint: "点击节点查看说明；悬停可高亮它的所有连接。",
+    mainLine: "主线",
     reservedPrefix: "预留舱",
     reservedText: "后续卷宗入口预留。",
   },
@@ -169,29 +177,151 @@ const uiText = {
     archiveTitle: "Spirit Connect Fantasy Book Sequence",
     archiveLead:
       "Current cover assets are wired in. When an English cover is missing, the site falls back to the Chinese cover until you replace it.",
+    views: ["Archive", "Story Lines", "Relation Graph"],
+    graphTip: "Drag view · Hover to highlight · Click a node",
+    storyHint: "The line is drawing... click any node to read the event.",
+    graphHint: "Click a node to read about it; hover to light up its connections.",
+    mainLine: "Main line",
     reservedPrefix: "Reserved Cabin",
     reservedText: "Future volume entry reserved.",
   },
 };
 
+const storyBooks = [
+  {
+    id: "moon",
+    glyph: "月",
+    accent: "#00e5ff",
+    title: { zh: "月球暗面", en: "Darkside of the Moon" },
+    subtitle: { zh: "档案 I · 第一扇门", en: "Archive I · The First Gate" },
+    status: { zh: "已出版", en: "Published" },
+    nodes: [
+      { zh: ["第二次数字矫正", "2118 年，十八岁的吉姆·维尔走进灵接舱，进行人生第二次数字矫正。这一次，有什么东西没有按程序进行。"], en: ["The Second Correction", "In 2118, Jim Vale enters the connection cabin for his second digital correction. This time, something does not follow the program."] },
+      { zh: ["唯一归来者", "吉姆醒来，带着不属于他的记忆。同一批参与者中，安娜·刘易斯与查理·黑尔没有醒来。"], en: ["The Only Returnee", "Jim wakes carrying memories that are not his. Anna Lewis and Charlie Hale do not wake at all."] },
+      { zh: ["月暗记录会议", "灵接幻想开始内部追查。卢恩博士第一个意识到：灵接舱连接的，可能不是公司建造的任何东西。"], en: ["The Record Meeting", "Spirit Connect begins its internal investigation. Dr. Lune suspects the cabin may not connect to anything the company built."] },
+      { zh: ["人类是宿主", "带回的记录开始与神话逐条对号。月球的工程真相浮出水面：它不完全是一颗天然卫星。"], en: ["Humanity as Host", "The recovered records begin to match myths. The engineering truth of the Moon surfaces: it is not entirely natural."] },
+      { zh: ["数字亚瑟", "最早一批上传者之一亚瑟·惠勒已停止生长。数字永生第一次露出它的缺陷。"], en: ["Digital Arthur", "Arthur Wheeler, among the first uploaded, has stopped growing. Digital immortality shows its flaw."] },
+      { zh: ["罗斯威尔遗产", "1947 年的残骸、百年逆向工程、2047 年的技术释放，灵接技术的真正来源终于被揭开。"], en: ["The Roswell Legacy", "The 1947 wreckage, a century of reverse engineering, and the 2047 release reveal the origin of connection technology."] },
+      { zh: ["死球理论", "肖恩·柯宾的危险假说：死在地球，意识会被势阱束缚；死在死球上，也许能挣脱。"], en: ["Dead Sphere Theory", "Shawn Corbin's dangerous hypothesis: die on Earth and consciousness is bound; die on a dead sphere and it may slip free."] },
+      { zh: ["解构倒计时", "艾拉告诉吉姆真相：安娜与查理正被月暗系统判定为异常意识，并被解构。"], en: ["The Countdown", "Elara tells Jim the truth: Anna and Charlie are being read as anomalies and deconstructed."] },
+      { zh: ["LUNA-EXIT", "斯皮尔的旧梦浮出水面：终点不是保存，而是迁出。吉姆决定用真正的肉体登月。"], en: ["LUNA-EXIT", "Spire's sealed program surfaces: the endpoint is not preservation, but migration. Jim decides to go to the Moon in the flesh."] },
+      { zh: ["发射与着陆", "穿过不可返回区域，吉姆在月球暗面着陆。没有副本，没有远程连接，没有退路。"], en: ["Launch & Landing", "Through the no-return zone, Jim lands on the far side. No copy, no remote link, no way back."] },
+      { zh: ["肉体死亡", "吉姆完成肉体死亡，进入真实的泰拉撒记录。第一扇门，从里面被打开了。"], en: ["Death of the Body", "Jim completes his bodily death and enters the true Terasa Records. The first door opens from the inside."] },
+      { zh: ["下一本入口", "泰拉撒深处，数字吉姆仍然存在。困着安娜与查理的两片区域开始微微发亮。"], en: ["The Next Entrance", "Deep in Terasa, digital Jim still exists. The regions holding Anna and Charlie begin to glow."] },
+    ],
+    branches: [
+      { from: 1, dir: "up", label: { zh: "数字吉姆的记忆碎片", en: "Fragments of Digital Jim" }, nodes: [
+        { zh: ["黑水与苏醒", "那段借来的记忆，开始于黑水，开始于从黑水中醒来。"], en: ["Black Water", "The borrowed memory begins in black water, and in waking from it."] },
+        { zh: ["石门之后的战场", "石门之后是远古战场，巨鲸形的阴影掠过不属于任何已知文明的骨骸。"], en: ["The Battlefield", "Beyond a stone gate lies an ancient battlefield, with whale-shaped shadows over impossible bones."] },
+        { zh: ["稻田与小女孩", "沙路尽头的稻田里，一个小女孩直视着吉姆的意识。他后来给她起名：艾拉。"], en: ["The Rice Field", "At the end of a sand road, a little girl looks straight into Jim's consciousness. He names her Elara."] },
+        { zh: ["时间井", "一颗蓝黑色的球体，和一口时间不走直线的井。"], en: ["The Time Well", "A blue-black sphere, and a well in which time is not a line."] },
+      ] },
+      { from: 7, dir: "down", label: { zh: "被困者", en: "The Trapped" }, nodes: [
+        { zh: ["安娜的区域", "记录边缘的树林里，有一只能直视意识的猫影。《灵猫》的入口。"], en: ["Anna's Region", "At the treeline, a cat-shadow can look into a mind. The entrance to Mystic Cat."] },
+        { zh: ["查理的区域", "时间切片中闪过尸山，和一头从天而降的巨鲸。《巨鲸陨落》的入口。"], en: ["Charlie’s Region", "A time-slice flashes a mountain of the dead and a whale falling from the sky. The entrance to Whale Fall."] },
+      ] },
+    ],
+  },
+  {
+    id: "whale",
+    glyph: "鲸",
+    accent: "#7c4dff",
+    title: { zh: "巨鲸陨落", en: "Whale Fall" },
+    subtitle: { zh: "档案 II · 法厄同证词", en: "Archive II · Phaethon Testimony" },
+    status: { zh: "筹备中", en: "In Development" },
+    nodes: [
+      { zh: ["尸山之上", "查理在一具陌生的身体里醒来，站在尸体堆成的山上。"], en: ["Mountain of the Dead", "Charlie wakes in a stranger's body, standing on a mountain of corpses."] },
+      { zh: ["巨鲸从天而降", "天空开始震动。一头燃烧的巨鲸自高空坠落，像星舰，也像文明的记忆。"], en: ["The Whale Falls", "The sky shudders. A burning whale descends like a starship and a civilization's memory."] },
+      { zh: ["宿主的名字", "这具身体叫洛安：远古战争的一名普通幸存者。"], en: ["The Host's Name", "The body is called Loan, an ordinary survivor of an ancient war."] },
+      { zh: ["谁赢了", "五族残骸铺满战场。所有人都以为战争胜利了，直到有人问：赢的是谁？"], en: ["Who Won", "The remains of five peoples cover the field. Everyone thinks the war is won until someone asks: by whom?"] },
+      { zh: ["战争的真相", "这不是资源战争。地球是正在成形的生命孵化场。"], en: ["Truth of the War", "This is not a resource war. Earth is a forming incubator of life."] },
+      { zh: ["巨鲸不是武器", "巨鲸族是星海的记忆载体，活的文明档案库。坠落从来不是攻击。"], en: ["Not a Weapon", "The whale-kind are memory vessels of the star sea. The fall was never an attack."] },
+      { zh: ["种子", "巨鲸族把一部分记忆、频率与生物蓝图封进年轻海洋的生命演化链。"], en: ["The Seed", "The whale-kind seal memory, frequency, and biological blueprint into the young ocean."] },
+      { zh: ["小行星带的诞生", "法厄同下沉碎裂。胜利者在残骸上争吵，只同意一件事：没有一族配拥有地球。"], en: ["The Belt Is Born", "Phaethon shatters. The victors agree on only one thing: no people deserves Earth."] },
+      { zh: ["蓝鲸在地球歌唱", "亿万年后，那颗种子长成了地球上最大的动物。查理听见了歌声。"], en: ["The Blue Whale Sings", "Ages later, the seed has become Earth's largest animal. Charlie hears the song."] },
+      { zh: ["宿主最后的选择", "洛安的故事走到尽头。怕死的人，也可能是最后一个站着的见证者。"], en: ["The Host's Choice", "Loan's story reaches its end. The one afraid to die may be the last witness standing."] },
+      { zh: ["回声归档", "记录闭合。查理把这场战争看到了最后。"], en: ["Echo Archived", "The record closes. Charlie watches the war through to its end."] },
+      { zh: ["没有完全死去", "巨鲸死在星空里，醒在地球的海中。"], en: ["Not Entirely Dead", "The whale died among the stars, and woke in the seas of Earth."] },
+    ],
+    branches: [
+      { from: 4, dir: "up", label: { zh: "五族的愿望", en: "Five Peoples" }, nodes: [
+        { zh: ["日辉族", "想要人类跪拜。"], en: ["Sunbright", "Wanted humanity kneeling."] },
+        { zh: ["鳞裔族", "想要漫长的地底潜伏。"], en: ["Scale-Kin", "Wanted a long concealment underground."] },
+        { zh: ["节肢族", "想要一个没有孤独的世界。"], en: ["Chitinous", "Wanted a world without loneliness."] },
+        { zh: ["渊民族", "想把记忆交给海。"], en: ["Abyssals", "Wanted to give memory to the sea."] },
+        { zh: ["震翼族", "只想天空还有路。"], en: ["Wing-Shiver", "Only wanted the sky to still have roads."] },
+      ] },
+      { from: 8, dir: "down", label: { zh: "来自外面的信号", en: "Signals from Outside" }, nodes: [
+        { zh: ["吉姆的信号", "月暗深处，吉姆的信号穿透了记录。"], en: ["Jim's Signal", "From the lunar dark, Jim's signal breaks through the record."] },
+        { zh: ["星环", "另一个吉姆，在记录的另一层，看见了同一道星环。"], en: ["The Star Ring", "Another Jim, in another layer, sees the same ring of stars."] },
+        { zh: ["查理不想走", "救援终于抵达时，查理犹豫了。他还没有看完。"], en: ["Charlie Hesitates", "When rescue arrives, Charlie hesitates. He has not finished watching."] },
+      ] },
+    ],
+  },
+];
+
+const graphTypes = {
+  book: { zh: "书卷", en: "Books", color: "#5ef9ff" },
+  character: { zh: "人物", en: "Characters", color: "#ffb454" },
+  event: { zh: "事件", en: "Events", color: "#a78bfa" },
+  concept: { zh: "概念", en: "Concepts", color: "#4dd0a1" },
+};
+
+const graphNodes = [
+  ["b1", "book", "月球暗面", "Darkside of the Moon", "档案 I · 第一扇门。系列入口。", "Archive I · The First Gate. The entrance to the series."],
+  ["b2", "book", "巨鲸陨落", "Whale Fall", "档案 II · 法厄同证词。查理在远古战争中的见证。", "Archive II · Phaethon Testimony. Charlie's witness of the ancient war."],
+  ["jim", "character", "吉姆·维尔", "Jim Vale", "第一扇门的打开者。", "Opener of the first door."],
+  ["djim", "character", "数字吉姆", "Digital Jim", "吉姆的数字双生体，主体核问题的入口。", "Jim's digital twin, entrance to the Subject Core problem."],
+  ["anna", "character", "安娜·刘易斯", "Anna Lewis", "困于非人类意识区域，《灵猫》的入口。", "Trapped in non-human consciousness; entrance to Mystic Cat."],
+  ["charlie", "character", "查理·黑尔", "Charlie Hale", "困于法厄同终战记录中的普通见证者。", "The ordinary witness trapped in the Phaethon record."],
+  ["elara", "character", "艾拉", "Elara", "小女孩形态只是投影，她的立场仍未解。", "The little girl is a projection; her allegiance remains open."],
+  ["spire", "character", "伊莱亚斯·斯皮尔", "Elias Spire", "灵接幻想创始人，迁出执念的源头。", "Founder of Spirit Connect and origin of the migration obsession."],
+  ["lune", "character", "卢恩博士", "Dr. Lune", "现实侧的伦理见证者。", "The ethical witness on the reality side."],
+  ["arthur", "character", "亚瑟·惠勒", "Arthur Wheeler", "最早上传者之一，其停滞是关键证据。", "One of the first uploaded; his stagnation is key evidence."],
+  ["corbin", "character", "肖恩·柯宾", "Shawn Corbin", "死球理论提出者。", "Author of the Dead Sphere Theory."],
+  ["loan", "character", "洛安", "Loan", "查理在远古战场醒来时所在的身体。", "The host body Charlie wakes in."],
+  ["e1947", "event", "罗斯威尔坠毁", "Roswell Crash", "意识接口残骸的起点。", "The beginning of the consciousness-interface wreckage."],
+  ["e2047", "event", "技术释放", "The Release", "百年逆向工程进入公众世界。", "A century of reverse engineering enters the public world."],
+  ["e2053", "event", "黑潮", "Black Tide", "物质文明信仰崩塌。", "Faith in material civilization collapses."],
+  ["e2118", "event", "矫正事故", "Correction Incident", "吉姆返回，安娜与查理没有醒来。", "Jim returns; Anna and Charlie do not wake."],
+  ["ecount", "event", "解构倒计时", "Deconstruction Countdown", "异常意识被月暗系统解构。", "Anomalous minds are deconstructed by the lunar system."],
+  ["emoon", "event", "月面肉体死亡", "Death on the Moon", "吉姆进入真实泰拉撒记录。", "Jim enters the true Terasa Records."],
+  ["ewar", "event", "法厄同终战", "Phaethon War", "围绕地球未来的太阳系终战。", "The final solar-system war over Earth's future."],
+  ["efall", "event", "巨鲸坠落", "The Whale Falls", "星舰般的巨鲸撕裂法厄同。", "A starship-like whale tears Phaethon apart."],
+  ["cabin", "concept", "灵接舱", "Connection Cabin", "低阶意识接口。", "A low-order consciousness interface."],
+  ["twin", "concept", "双生模式", "Twin Mode", "肉体与数字生命并行发展。", "Physical and digital lives develop in parallel."],
+  ["core", "concept", "主体核", "Subject Core", "只能迁移，永不可复制。", "Can only migrate; can never be copied."],
+  ["dead", "concept", "死球理论", "Dead Sphere Theory", "死亡地点决定意识去向的危险假说。", "The dangerous hypothesis that death location determines consciousness destination."],
+  ["terasa", "concept", "泰拉撒记录", "Terasa Records", "月球暗面的古老记录系统。", "The ancient recording system on the lunar far side."],
+  ["luna", "concept", "LUNA-EXIT", "LUNA-EXIT", "终点不是保存，而是迁出。", "The endpoint is not preservation, but migration."],
+  ["roswell", "concept", "罗斯威尔接口", "Roswell Interface", "意识结构直接耦合的接口。", "An interface coupled directly to consciousness."],
+  ["song", "concept", "蓝鲸歌声", "Whale Song", "封进海洋生命链的低频回声。", "A low-frequency echo sealed into ocean life."],
+  ["whalekind", "concept", "巨鲸族", "Whale-Kind", "星海的记忆载体。", "Memory vessels of the star sea."],
+  ["five", "concept", "五族", "Five Peoples", "远古战争中的五个族群。", "The five peoples of the ancient war."],
+  ["incub", "concept", "地球孵化场", "Earth Incubator", "地球作为生命实验场。", "Earth as a life experiment."],
+  ["cat", "concept", "灵猫文明", "Spirit-Cat Network", "动物意识的高阶网络。", "A higher network of animal consciousness."],
+].map(([id, type, zh, en, zhd, end]) => ({ id, type, label: { zh, en }, d: { zh: zhd, en: end } }));
+
+const graphLinks = [["b1","jim"],["b1","e2118"],["b1","elara"],["b1","terasa"],["b1","emoon"],["b1","ecount"],["b2","charlie"],["b2","ewar"],["b2","efall"],["b2","loan"],["b2","five"],["jim","djim"],["jim","anna"],["jim","charlie"],["jim","e2118"],["jim","elara"],["jim","emoon"],["jim","lune"],["jim","spire"],["djim","terasa"],["djim","core"],["anna","e2118"],["anna","cat"],["anna","ecount"],["charlie","e2118"],["charlie","loan"],["charlie","efall"],["charlie","ecount"],["charlie","song"],["elara","terasa"],["spire","luna"],["spire","arthur"],["spire","cabin"],["lune","cabin"],["arthur","core"],["corbin","dead"],["dead","emoon"],["luna","emoon"],["cabin","twin"],["cabin","roswell"],["twin","e2118"],["twin","core"],["roswell","e1947"],["e1947","e2047"],["e2047","e2053"],["e2053","cabin"],["terasa","incub"],["ewar","five"],["ewar","incub"],["ewar","efall"],["whalekind","efall"],["whalekind","song"],["cat","terasa"]];
+
 const themes = {
   day: {
-    bg: "#eaf3fb",
-    fog: "#edf5fb",
-    fogNear: 70,
-    fogFar: 420,
-    floor: "#d6e1ea",
-    shell: "#f2f7fb",
-    pearl: "#c3d0dc",
-    glass: "#87d7ff",
+    bg: "#d5e3ef",
+    fog: "#dbe7f0",
+    fogNear: 95,
+    fogFar: 430,
+    floor: "#b6c6d3",
+    shell: "#dce8f1",
+    pearl: "#96aabc",
+    glass: "#50bce8",
     darkGlass: "#18314a",
-    rail: "#76899b",
-    hemiSky: "#ffffff",
-    hemiGround: "#8793a0",
-    hemiIntensity: 1.35,
-    keyIntensity: 3.2,
-    env: 0.5,
-    bloom: 0.48,
+    rail: "#51697d",
+    hemiSky: "#eaf6ff",
+    hemiGround: "#3e5367",
+    hemiIntensity: 1.05,
+    keyIntensity: 2.6,
+    env: 0.36,
+    bloom: 0.56,
   },
   night: {
     bg: "#04080f",
@@ -251,10 +381,28 @@ const els = {
   archiveEyebrow: document.querySelector("[data-i18n='archiveEyebrow']"),
   archiveTitle: document.querySelector("[data-i18n='archiveTitle']"),
   archiveLead: document.querySelector("[data-i18n='archiveLead']"),
+  graphTip: document.querySelector("[data-i18n='graphTip']"),
   bookLink: document.querySelector("[data-i18n='enter']"),
   langButtons: [...document.querySelectorAll("[data-lang]")],
   modeButtons: [...document.querySelectorAll("[data-mode]")],
+  finalViewButtons: [...document.querySelectorAll("[data-final-view]")],
 };
+
+const storyEls = {
+  list: document.getElementById("story-book-list"),
+  canvas: document.getElementById("storyline-canvas"),
+  detail: document.getElementById("storyline-detail"),
+  graph: document.getElementById("relation-graph"),
+  graphDetail: document.getElementById("graph-detail"),
+  graphChips: document.getElementById("graph-chips"),
+};
+
+let selectedStoryBook = storyBooks[0];
+let selectedGraphNode = null;
+let hoveredGraphNode = null;
+let graphInitialized = false;
+let graphHiddenTypes = {};
+let graphCamera = { x: 0, y: 0, k: 1 };
 
 scrollStage.style.position = "fixed";
 scrollStage.style.inset = "0";
@@ -328,35 +476,8 @@ const mats = {
   goldGlow: new THREE.MeshStandardMaterial({ color: "#1a1206", emissive: "#d79b3a", emissiveIntensity: 0.9, roughness: 0.42 }),
 };
 
-const camPositions = [
-  [0, 98, 315],
-  [0, 60, 226],
-  [96, 38, 144],
-  [136, 26, 30],
-  [92, 24, -112],
-  [-24, 23, -150],
-  [-128, 25, -68],
-  [-138, 28, 62],
-  [-62, 34, 142],
-  [0, 86, 190],
-  [0, 204, 70],
-  [0, 300, 0],
-];
-
-const camTargets = [
-  [0, 18, 0],
-  [0, 16, 0],
-  [74, 14, 78],
-  [120, 13, 0],
-  [72, 13, -96],
-  [0, 14, -126],
-  [-104, 13, -60],
-  [-120, 13, 54],
-  [-64, 13, 110],
-  [0, 16, 0],
-  [0, 0, 0],
-  [0, 0, 0],
-];
+const camPositions = buildCameraPositions();
+const camTargets = buildCameraTargets();
 
 const posCurve = new THREE.CatmullRomCurve3(camPositions.map((p) => new THREE.Vector3(...p)), false, "centripetal");
 const targetCurve = new THREE.CatmullRomCurve3(camTargets.map((p) => new THREE.Vector3(...p)), false, "centripetal");
@@ -364,13 +485,50 @@ const camPos = new THREE.Vector3();
 const camTarget = new THREE.Vector3();
 const clock = new THREE.Clock();
 
+function cabinAngle(index) {
+  return (index / CABIN_COUNT) * Math.PI * 2 - Math.PI / 2;
+}
+
+function cabinPoint(index, radius = 134, y = 16) {
+  const a = cabinAngle(index);
+  return new THREE.Vector3(Math.cos(a) * radius, y, Math.sin(a) * radius);
+}
+
+function buildCameraPositions() {
+  const pts = [
+    [0, 104, 320],
+    [0, 68, 238],
+  ];
+  for (let i = 0; i < CABIN_COUNT; i++) {
+    const a = cabinAngle(i);
+    pts.push([Math.cos(a) * 214, 38, Math.sin(a) * 214]);
+    pts.push([Math.cos(a + 0.18) * 184, 28, Math.sin(a + 0.18) * 184]);
+  }
+  pts.push([0, 122, 230], [0, 240, 92], [0, 310, 0]);
+  return pts;
+}
+
+function buildCameraTargets() {
+  const pts = [
+    [0, 18, 0],
+    [0, 16, 0],
+  ];
+  for (let i = 0; i < CABIN_COUNT; i++) {
+    const p = cabinPoint(i, 134, 17);
+    pts.push([p.x, p.y, p.z]);
+    pts.push([p.x, p.y + 6, p.z]);
+  }
+  pts.push([0, 16, 0], [0, 0, 0], [0, 0, 0]);
+  return pts;
+}
+
 buildEnvironment();
 const capsules = buildCapsules();
 const starField = buildParticles();
 const bookSprites = buildBookSprites();
 wireControls();
 applyLanguage("zh");
-applyTheme("day");
+applyTheme("night");
 onResize();
 onScroll();
 animate();
@@ -395,25 +553,21 @@ function buildEnvironment() {
   floor.receiveShadow = true;
   root.add(floor);
 
-  const outer = new THREE.Mesh(new THREE.TorusGeometry(154, 1.5, 16, 192), mats.blueGlow);
-  outer.rotation.x = Math.PI / 2;
-  outer.position.y = 0.55;
-  root.add(outer);
+  const headRing = new THREE.Mesh(new THREE.TorusGeometry(148, 1.05, 14, 192), mats.blueGlow);
+  headRing.rotation.x = Math.PI / 2;
+  headRing.position.y = 0.9;
+  headRing.scale.set(1, 1, 0.92);
+  headRing.castShadow = true;
+  headRing.receiveShadow = true;
+  root.add(headRing);
 
-  const inner = new THREE.Mesh(new THREE.TorusGeometry(72, 0.9, 12, 160), mats.goldGlow);
-  inner.rotation.x = Math.PI / 2;
-  inner.position.y = 0.78;
-  root.add(inner);
-
-  for (let i = 0; i < 12; i++) {
-    const a = (i / 12) * Math.PI * 2;
-    const path = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.45, 76), mats.rail);
-    path.position.set(Math.cos(a) * 110, 0.42, Math.sin(a) * 110);
-    path.rotation.y = -a;
-    path.castShadow = true;
-    path.receiveShadow = true;
-    root.add(path);
-  }
+  const tailRing = new THREE.Mesh(new THREE.TorusGeometry(118, 0.8, 14, 192), mats.goldGlow);
+  tailRing.rotation.x = Math.PI / 2;
+  tailRing.position.y = 1.08;
+  tailRing.scale.set(1, 1, 0.88);
+  tailRing.castShadow = true;
+  tailRing.receiveShadow = true;
+  root.add(tailRing);
 
   const dome = new THREE.Mesh(
     new THREE.SphereGeometry(238, 80, 28, 0, Math.PI * 2, 0, Math.PI / 2),
@@ -460,10 +614,10 @@ function buildCapsules() {
   const baseGeo = new THREE.BoxGeometry(19, 4, 46);
   const canopyGeo = new THREE.CapsuleGeometry(6.7, 20, 10, 22);
 
-  for (let i = 0; i < 12; i++) {
-    const angle = (i / 12) * Math.PI * 2 - Math.PI / 2;
+  for (let i = 0; i < CABIN_COUNT; i++) {
+    const angle = cabinAngle(i);
     const pod = new THREE.Group();
-    const book = books[i] || null;
+    const book = cabinBooks[i] || null;
     pod.position.set(Math.cos(angle) * 134, 3.8, Math.sin(angle) * 134);
     pod.rotation.y = -angle + Math.PI / 2;
 
@@ -490,9 +644,10 @@ function buildCapsules() {
     const rimMat = book
       ? new THREE.MeshStandardMaterial({ color: "#07131d", emissive: book.accent, emissiveIntensity: 1.2, roughness: 0.4 })
       : mats.rail;
-    const rim = new THREE.Mesh(new THREE.TorusGeometry(8.5, 0.3, 10, 70), rimMat);
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(7.05, 0.32, 10, 84), rimMat);
     rim.rotation.x = Math.PI / 2;
-    rim.position.set(0, 6.75, -1.6);
+    rim.position.set(0, 6.83, -1.6);
+    rim.scale.set(1, 1.58, 1);
     pod.add(rim);
 
     const marker = makeTextSprite(book ? book.glyph.zh : String(i + 1).padStart(2, "0"), book?.accent || "#8da1b3");
@@ -542,17 +697,18 @@ function buildParticles() {
 
 function buildBookSprites() {
   const group = new THREE.Group();
-  const items = books.map((book, i) => {
+  const items = cabinBooks.map((book, i) => {
     const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
       map: getTexture(getCover(book)),
       transparent: true,
-      opacity: 0,
+      opacity: 0.78,
       depthWrite: false,
     }));
-    const angle = (i / 12) * Math.PI * 2 - Math.PI / 2;
-    sprite.position.set(Math.cos(angle) * 112, 39, Math.sin(angle) * 112);
-    sprite.scale.set(27, 40, 1);
-    sprite.visible = false;
+    const angle = cabinAngle(i);
+    sprite.position.set(Math.cos(angle) * 122, 38, Math.sin(angle) * 122);
+    sprite.scale.set(18, 27, 1);
+    sprite.visible = true;
+    sprite.userData.base = sprite.position.clone();
     group.add(sprite);
     return sprite;
   });
@@ -581,6 +737,9 @@ function makeTextSprite(text, color) {
 function wireControls() {
   els.langButtons.forEach((btn) => btn.addEventListener("click", () => applyLanguage(btn.dataset.lang)));
   els.modeButtons.forEach((btn) => btn.addEventListener("click", () => applyTheme(btn.dataset.mode)));
+  els.finalViewButtons.forEach((btn) => {
+    btn.addEventListener("click", () => showFinalView(btn.dataset.finalView));
+  });
 }
 
 function applyLanguage(next) {
@@ -596,7 +755,11 @@ function applyLanguage(next) {
   els.archiveEyebrow.textContent = copy.archiveEyebrow;
   els.archiveTitle.textContent = copy.archiveTitle;
   els.archiveLead.textContent = copy.archiveLead;
+  els.graphTip.textContent = copy.graphTip;
   els.bookLink.textContent = copy.enter;
+  els.finalViewButtons.forEach((btn, i) => {
+    btn.textContent = copy.views[i];
+  });
   els.langButtons.forEach((btn) => btn.classList.toggle("is-active", btn.dataset.lang === language));
   els.modeButtons.forEach((btn) => {
     btn.textContent = btn.dataset.mode === "day" ? copy.day : copy.night;
@@ -608,10 +771,13 @@ function applyLanguage(next) {
     item.marker.material = newMarker.material;
   });
   bookSprites?.forEach((sprite, i) => {
-    sprite.material.map = getTexture(getCover(books[i]));
+    sprite.material.map = getTexture(getCover(cabinBooks[i]));
     sprite.material.needsUpdate = true;
   });
   buildArchive();
+  buildStoryline();
+  setupGraph();
+  drawRelationGraph();
   setActiveBook(activeBook < 0 ? 0 : activeBook, true);
 }
 
@@ -666,11 +832,351 @@ function buildArchive() {
     .join("");
 }
 
+function showFinalView(view) {
+  els.finalViewButtons.forEach((btn) => btn.classList.toggle("is-active", btn.dataset.finalView === view));
+  document.querySelectorAll(".final-view").forEach((el) => el.classList.remove("is-active"));
+  document.getElementById(`final-${view}`).classList.add("is-active");
+  if (view === "storyline") buildStoryline();
+  if (view === "graph") {
+    setupGraph();
+    drawRelationGraph();
+  }
+}
+
+function storyNodeText(node) {
+  const pair = node[language] || node.zh || node.en;
+  return { t: pair[0], d: pair[1] };
+}
+
+function buildStoryline() {
+  if (!storyEls.list || !storyEls.canvas) return;
+  const copy = uiText[language];
+  storyEls.list.innerHTML = "";
+  storyBooks.forEach((book) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `story-book ${book === selectedStoryBook ? "is-active" : ""}`;
+    button.style.color = book.accent;
+    button.innerHTML = `
+      <span class="story-book-glyph">${book.glyph}</span>
+      <span><strong>${book.title[language] || book.title.zh}</strong><span>${book.subtitle[language] || book.subtitle.zh} · ${book.status[language] || book.status.zh}</span></span>
+    `;
+    button.addEventListener("click", () => {
+      selectedStoryBook = book;
+      buildStoryline();
+    });
+    storyEls.list.appendChild(button);
+  });
+
+  const book = selectedStoryBook;
+  const nodes = book.nodes.map(storyNodeText);
+  const branchData = (book.branches || []).map((branch) => ({
+    ...branch,
+    labelText: branch.label[language] || branch.label.zh,
+    nodes: branch.nodes.map(storyNodeText),
+  }));
+  const n = nodes.length;
+  const SP = 112;
+  const X0 = 80;
+  const Y = 252;
+  const H = 500;
+  let lastX = X0 + (n - 1) * SP;
+  branchData.forEach((branch) => {
+    const bx = X0 + branch.from * SP + 52 + (branch.nodes.length - 1) * 96;
+    if (bx > lastX) lastX = bx;
+  });
+  const W = lastX + 140;
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("width", W);
+  svg.setAttribute("height", H);
+  svg.setAttribute("class", "story-svg");
+  storyEls.canvas.innerHTML = "";
+  storyEls.canvas.appendChild(svg);
+
+  const defs = document.createElementNS(ns, "defs");
+  defs.innerHTML = `<filter id="storyGlow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  svg.appendChild(defs);
+
+  const add = (tag, attrs, parent = svg) => {
+    const el = document.createElementNS(ns, tag);
+    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+    parent.appendChild(el);
+    return el;
+  };
+
+  add("path", {
+    d: `M ${X0} ${Y} L ${X0 + (n - 1) * SP} ${Y}`,
+    stroke: book.accent,
+    "stroke-width": 2.8,
+    fill: "none",
+    filter: "url(#storyGlow)",
+    "stroke-linecap": "round",
+  });
+
+  nodes.forEach((node, i) => {
+    const x = X0 + i * SP;
+    const group = add("g", { class: "story-node", tabindex: "0" });
+    const above = i % 2 === 0;
+    add("circle", { cx: x, cy: Y, r: 18, fill: "transparent" }, group);
+    add("circle", { cx: x, cy: Y, r: 6, fill: "#0f1b2d", stroke: book.accent, "stroke-width": 2, class: "story-dot", filter: "url(#storyGlow)" }, group);
+    const text = add("text", { x, y: above ? Y - 22 : Y + 36, "text-anchor": "middle", class: "story-label" }, group);
+    text.textContent = node.t;
+    group.addEventListener("click", () => showStoryDetail(book, node, copy.mainLine, group, svg));
+  });
+
+  branchData.forEach((branch) => {
+    const sx = X0 + branch.from * SP;
+    const dir = branch.dir === "up" ? -1 : 1;
+    const by = Y + dir * 86;
+    const endX = sx + 52 + (branch.nodes.length - 1) * 96;
+    add("path", {
+      d: `M ${sx} ${Y} L ${sx + 52} ${by} L ${endX} ${by}`,
+      stroke: book.accent,
+      "stroke-width": 1.7,
+      fill: "none",
+      opacity: 0.76,
+      "stroke-linecap": "round",
+    });
+    const label = add("text", { x: endX + 14, y: by + 4, fill: book.accent, class: "story-branch-label" });
+    label.textContent = branch.labelText;
+    branch.nodes.forEach((node, j) => {
+      const x = sx + 52 + j * 96;
+      const group = add("g", { class: "story-node", tabindex: "0" });
+      add("circle", { cx: x, cy: by, r: 14, fill: "transparent" }, group);
+      add("circle", { cx: x, cy: by, r: 4.7, fill: "#0f1b2d", stroke: book.accent, "stroke-width": 1.6, class: "story-dot" }, group);
+      const text = add("text", { x, y: dir < 0 ? by - 14 : by + 24, "text-anchor": "middle", class: "story-label story-label-small" }, group);
+      text.textContent = node.t;
+      group.addEventListener("click", () => showStoryDetail(book, node, branch.labelText, group, svg));
+    });
+  });
+
+  storyEls.detail.innerHTML = `<p>${copy.storyHint}</p>`;
+}
+
+function showStoryDetail(book, node, context, group, svg) {
+  svg.querySelectorAll(".story-node.is-active").forEach((el) => el.classList.remove("is-active"));
+  group.classList.add("is-active");
+  storyEls.detail.innerHTML = `
+    <span class="story-detail-meta" style="color:${book.accent}">${book.title[language] || book.title.zh} · ${context}</span>
+    <h3>${node.t}</h3>
+    <p>${node.d}</p>
+  `;
+}
+
+function setupGraph() {
+  if (!storyEls.graph || graphInitialized) {
+    refreshGraphChips();
+    return;
+  }
+  graphInitialized = true;
+  const golden = Math.PI * (3 - Math.sqrt(5));
+  graphNodes.forEach((node, i) => {
+    const r = 42 + Math.sqrt(i) * 26;
+    const a = i * golden;
+    node.x = Math.cos(a) * r;
+    node.y = Math.sin(a) * r;
+    node.vx = 0;
+    node.vy = 0;
+  });
+  relaxGraph(260);
+  storyEls.graph.addEventListener("mousemove", onGraphMove);
+  storyEls.graph.addEventListener("mouseleave", () => {
+    hoveredGraphNode = null;
+    drawRelationGraph();
+  });
+  storyEls.graph.addEventListener("click", onGraphClick);
+  storyEls.graph.addEventListener("wheel", (ev) => {
+    ev.preventDefault();
+    graphCamera.k = clamp(graphCamera.k * (ev.deltaY < 0 ? 1.12 : 0.9), 0.55, 2.8);
+    drawRelationGraph();
+  }, { passive: false });
+  refreshGraphChips();
+}
+
+function refreshGraphChips() {
+  if (!storyEls.graphChips) return;
+  storyEls.graphChips.innerHTML = "";
+  Object.entries(graphTypes).forEach(([type, meta]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `graph-chip ${graphHiddenTypes[type] ? "" : "is-active"}`;
+    button.innerHTML = `<span class="graph-chip-dot" style="background:${meta.color}"></span>${meta[language]}`;
+    button.addEventListener("click", () => {
+      graphHiddenTypes[type] = !graphHiddenTypes[type];
+      refreshGraphChips();
+      drawRelationGraph();
+    });
+    storyEls.graphChips.appendChild(button);
+  });
+}
+
+function relaxGraph(iterations) {
+  const byId = Object.fromEntries(graphNodes.map((node) => [node.id, node]));
+  const links = graphLinks.map(([a, b]) => [byId[a], byId[b]]).filter(([a, b]) => a && b);
+  for (let step = 0; step < iterations; step++) {
+    for (let i = 0; i < graphNodes.length; i++) {
+      for (let j = i + 1; j < graphNodes.length; j++) {
+        const a = graphNodes[i];
+        const b = graphNodes[j];
+        let dx = a.x - b.x;
+        let dy = a.y - b.y;
+        const d2 = dx * dx + dy * dy + 0.01;
+        const f = 650 / d2;
+        const d = Math.sqrt(d2);
+        dx /= d;
+        dy /= d;
+        a.vx += dx * f;
+        a.vy += dy * f;
+        b.vx -= dx * f;
+        b.vy -= dy * f;
+      }
+    }
+    links.forEach(([a, b]) => {
+      let dx = b.x - a.x;
+      let dy = b.y - a.y;
+      const d = Math.sqrt(dx * dx + dy * dy) + 0.01;
+      const f = (d - 112) * 0.012;
+      dx /= d;
+      dy /= d;
+      a.vx += dx * f;
+      a.vy += dy * f;
+      b.vx -= dx * f;
+      b.vy -= dy * f;
+    });
+    graphNodes.forEach((node) => {
+      node.vx -= node.x * 0.004;
+      node.vy -= node.y * 0.004;
+      node.x += node.vx;
+      node.y += node.vy;
+      node.vx *= 0.78;
+      node.vy *= 0.78;
+    });
+  }
+}
+
+function graphToScreen(node, rect) {
+  return {
+    x: rect.width / 2 + (node.x - graphCamera.x) * graphCamera.k,
+    y: rect.height / 2 + (node.y - graphCamera.y) * graphCamera.k,
+  };
+}
+
+function pickGraphNode(ev) {
+  const rect = storyEls.graph.getBoundingClientRect();
+  const x = ev.clientX - rect.left;
+  const y = ev.clientY - rect.top;
+  let best = null;
+  let bestD = Infinity;
+  graphNodes.forEach((node) => {
+    if (graphHiddenTypes[node.type]) return;
+    const p = graphToScreen(node, rect);
+    const d = Math.hypot(p.x - x, p.y - y);
+    if (d < Math.max(11, node.type === "book" ? 17 : 12) && d < bestD) {
+      best = node;
+      bestD = d;
+    }
+  });
+  return best;
+}
+
+function onGraphMove(ev) {
+  hoveredGraphNode = pickGraphNode(ev);
+  storyEls.graph.style.cursor = hoveredGraphNode ? "pointer" : "crosshair";
+  drawRelationGraph();
+}
+
+function onGraphClick(ev) {
+  selectedGraphNode = pickGraphNode(ev);
+  if (!selectedGraphNode) return;
+  const meta = graphTypes[selectedGraphNode.type];
+  const count = graphLinks.filter(([a, b]) => a === selectedGraphNode.id || b === selectedGraphNode.id).length;
+  storyEls.graphDetail.innerHTML = `
+    <span class="story-detail-meta" style="color:${meta.color}">${meta[language]} · ${count}</span>
+    <h3>${selectedGraphNode.label[language]}</h3>
+    <p>${selectedGraphNode.d[language]}</p>
+  `;
+  drawRelationGraph();
+}
+
+function drawRelationGraph() {
+  if (!storyEls.graph) return;
+  const canvas = storyEls.graph;
+  const rect = canvas.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  if (canvas.width !== Math.floor(rect.width * dpr) || canvas.height !== Math.floor(rect.height * dpr)) {
+    canvas.width = Math.floor(rect.width * dpr);
+    canvas.height = Math.floor(rect.height * dpr);
+  }
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, rect.width, rect.height);
+  const byId = Object.fromEntries(graphNodes.map((node) => [node.id, node]));
+  const focus = hoveredGraphNode || selectedGraphNode;
+  const linked = new Set();
+  if (focus) {
+    linked.add(focus.id);
+    graphLinks.forEach(([a, b]) => {
+      if (a === focus.id) linked.add(b);
+      if (b === focus.id) linked.add(a);
+    });
+  }
+
+  graphLinks.forEach(([aId, bId]) => {
+    const a = byId[aId];
+    const b = byId[bId];
+    if (!a || !b || graphHiddenTypes[a.type] || graphHiddenTypes[b.type]) return;
+    const pa = graphToScreen(a, rect);
+    const pb = graphToScreen(b, rect);
+    const hot = focus && (a.id === focus.id || b.id === focus.id);
+    ctx.strokeStyle = hot ? "rgba(94,249,255,.9)" : focus ? "rgba(160,180,210,.08)" : "rgba(160,180,210,.24)";
+    ctx.lineWidth = hot ? 1.7 : 1;
+    ctx.beginPath();
+    ctx.moveTo(pa.x, pa.y);
+    ctx.lineTo(pb.x, pb.y);
+    ctx.stroke();
+  });
+
+  graphNodes.forEach((node) => {
+    if (graphHiddenTypes[node.type]) return;
+    const p = graphToScreen(node, rect);
+    const meta = graphTypes[node.type];
+    const hot = !focus || linked.has(node.id);
+    const r = node.type === "book" ? 13 : node.type === "character" ? 9 : 7;
+    ctx.globalAlpha = hot ? 1 : 0.14;
+    ctx.shadowColor = meta.color;
+    ctx.shadowBlur = node === focus || node === selectedGraphNode ? 22 : 10;
+    ctx.fillStyle = meta.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    if (node === selectedGraphNode) {
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r + 4, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = hot ? 0.9 : 0.12;
+    ctx.fillStyle = mode === "night" ? "#dbe7f6" : "#eef7ff";
+    ctx.font = `${node.type === "book" ? 13 : 11}px "Microsoft YaHei", sans-serif`;
+    ctx.textAlign = "center";
+    ctx.fillText(node.label[language], p.x, p.y + r + 14);
+    ctx.globalAlpha = 1;
+  });
+
+  if (!selectedGraphNode) {
+    storyEls.graphDetail.innerHTML = `<p>${uiText[language].graphHint}</p>`;
+  }
+}
+
 function setActiveBook(index, force = false) {
   if (index === activeBook && !force) return;
   activeBook = index;
-  if (index < 0 || !books[index]) return;
-  const book = books[index];
+  if (index < 0 || !cabinBooks[index]) return;
+  const book = cabinBooks[index];
   glyph.textContent = book.glyph[language] || book.glyph.zh;
   kicker.textContent = book.kicker[language] || book.kicker.zh;
   title.textContent = book.title[language] || book.title.zh;
@@ -703,7 +1209,7 @@ function updateDom(p) {
 
   if (p >= 0.16 && p < 0.78) {
     const local = (p - 0.16) / 0.62;
-    setActiveBook(clamp(Math.floor(local * books.length), 0, books.length - 1));
+    setActiveBook(clamp(Math.floor(local * cabinBooks.length), 0, cabinBooks.length - 1));
   } else if (p < 0.16) {
     setActiveBook(-1);
   }
@@ -735,9 +1241,16 @@ function updateScene(dt, elapsed) {
   });
   bookSprites.forEach((sprite, i) => {
     const active = activeBook === i && progress > 0.17 && progress < 0.78;
-    sprite.visible = active || sprite.material.opacity > 0.01;
-    sprite.material.opacity += ((active ? 1 : 0) - sprite.material.opacity) * Math.min(1, dt * 5);
-    sprite.position.y = 40 + Math.sin(elapsed * 1.5) * 1.4;
+    sprite.visible = true;
+    sprite.material.opacity += ((active ? 1 : 0.62) - sprite.material.opacity) * Math.min(1, dt * 4.5);
+    const base = sprite.userData.base;
+    sprite.position.x = base.x;
+    sprite.position.z = base.z;
+    sprite.position.y = base.y + Math.sin(elapsed * 1.2 + i) * 0.8 + (active ? 9 + Math.sin(elapsed * 2.4) * 1.5 : 0);
+    const targetScale = active ? 1.48 : 1;
+    const currentScale = sprite.scale.x / 18;
+    const nextScale = currentScale + (targetScale - currentScale) * Math.min(1, dt * 4.5);
+    sprite.scale.set(18 * nextScale, 27 * nextScale, 1);
     sprite.lookAt(camera.position);
   });
 }
@@ -767,6 +1280,7 @@ function onResize() {
   bloom.setSize(w, h);
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
+  drawRelationGraph();
 }
 
 window.addEventListener("wheel", onWheel, { passive: false });

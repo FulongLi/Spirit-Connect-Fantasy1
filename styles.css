@@ -401,6 +401,228 @@ body[data-theme="night"] .overview {
   margin-top: 28px;
 }
 
+.archive-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.archive-tabs button,
+.story-book,
+.graph-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.72);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+body[data-theme="night"] .archive-tabs button,
+body[data-theme="night"] .story-book,
+body[data-theme="night"] .graph-chip {
+  background: rgba(8, 17, 29, 0.74);
+}
+
+.archive-tabs button {
+  min-height: 38px;
+  padding: 0 16px;
+}
+
+.archive-tabs button.is-active,
+.story-book.is-active,
+.graph-chip.is-active {
+  color: var(--ink);
+  border-color: rgba(43, 184, 255, 0.58);
+  box-shadow: 0 0 22px rgba(43, 184, 255, 0.14);
+}
+
+.final-view {
+  display: none;
+  margin-top: 18px;
+}
+
+.final-view.is-active {
+  display: block;
+}
+
+.storyline-layout {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 16px;
+  min-height: 430px;
+}
+
+.story-books {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.story-book {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 10px;
+  align-items: center;
+  min-height: 72px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.story-book-glyph {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  aspect-ratio: 0.72;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  font-weight: 900;
+}
+
+.story-book strong {
+  display: block;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.story-book span:last-child {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.story-stage {
+  min-width: 0;
+}
+
+.story-canvas {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(8, 18, 32, 0.72);
+}
+
+body[data-theme="day"] .story-canvas {
+  background: rgba(10, 32, 54, 0.84);
+}
+
+.story-svg {
+  display: block;
+}
+
+.story-node {
+  cursor: pointer;
+}
+
+.story-node:hover .story-dot,
+.story-node.is-active .story-dot {
+  fill: #fff;
+  stroke-width: 3;
+}
+
+.story-label {
+  fill: #dbe7f6;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.story-label-small {
+  fill: #a9bed6;
+  font-size: 10.5px;
+}
+
+.story-branch-label {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.story-detail {
+  min-height: 108px;
+  margin-top: 12px;
+  padding: 15px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--glass);
+  box-shadow: 0 14px 44px var(--panel-shadow);
+}
+
+.story-detail h3 {
+  margin: 5px 0 7px;
+  color: var(--ink);
+  font-size: 20px;
+}
+
+.story-detail p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.story-detail-meta {
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.graph-wrap {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(43, 184, 255, 0.14), transparent 42%),
+    rgba(8, 18, 32, 0.82);
+}
+
+.relation-graph {
+  display: block;
+  width: 100%;
+  height: 430px;
+  cursor: crosshair;
+}
+
+.graph-chips {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.graph-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.graph-chip-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+}
+
+.graph-tip {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  color: rgba(219, 231, 246, 0.7);
+  font-size: 12px;
+  pointer-events: none;
+}
+
 .archive-card {
   min-height: 162px;
   padding: 18px;
@@ -497,6 +719,14 @@ body[data-theme="night"] .archive-card {
   .archive-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .storyline-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .story-books {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 520px) {
@@ -520,6 +750,10 @@ body[data-theme="night"] .archive-card {
   }
 
   .archive-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .story-books {
     grid-template-columns: 1fr;
   }
 }

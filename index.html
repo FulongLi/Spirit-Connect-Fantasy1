@@ -7,7 +7,7 @@
     <meta name="description" content="Spirit Connect Fantasy 小说档案的沉浸式展示原型。" />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body data-theme="day" data-lang="zh">
+  <body data-theme="night" data-lang="zh">
     <canvas id="scene" aria-label="Spirit Connect Fantasy 环形档案舱场景"></canvas>
 
     <main id="scroll-stage">
@@ -26,8 +26,8 @@
           <button type="button" data-lang="en">EN</button>
         </div>
         <div class="segmented" aria-label="Theme">
-          <button type="button" class="is-active" data-mode="day">白天</button>
-          <button type="button" data-mode="night">夜间</button>
+          <button type="button" data-mode="day">白天</button>
+          <button type="button" class="is-active" data-mode="night">夜间</button>
         </div>
       </div>
     </header>
@@ -69,7 +69,31 @@
           先放入前三卷的明确入口，其余九座舱作为未来卷宗预留。后续你补正文、封面或章节时，
           直接扩展数据即可让镜头继续接入。
         </p>
-        <div class="archive-grid" id="archive-list"></div>
+        <div class="archive-tabs" role="tablist" aria-label="Archive views">
+          <button type="button" class="is-active" data-final-view="archive">书卷总览</button>
+          <button type="button" data-final-view="storyline">故事线</button>
+          <button type="button" data-final-view="graph">关系图谱</button>
+        </div>
+        <div class="final-view is-active" id="final-archive">
+          <div class="archive-grid" id="archive-list"></div>
+        </div>
+        <div class="final-view" id="final-storyline">
+          <div class="storyline-layout">
+            <div class="story-books" id="story-book-list"></div>
+            <div class="story-stage">
+              <div class="story-canvas" id="storyline-canvas"></div>
+              <div class="story-detail" id="storyline-detail"></div>
+            </div>
+          </div>
+        </div>
+        <div class="final-view" id="final-graph">
+          <div class="graph-wrap">
+            <div class="graph-chips" id="graph-chips"></div>
+            <canvas id="relation-graph" class="relation-graph" aria-label="Relation graph"></canvas>
+            <div class="graph-tip" data-i18n="graphTip">拖拽视图 · 悬停高亮 · 点击节点查看说明</div>
+          </div>
+          <div class="story-detail" id="graph-detail"></div>
+        </div>
       </div>
     </section>
 
