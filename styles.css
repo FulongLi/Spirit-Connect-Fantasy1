@@ -363,12 +363,14 @@ body[data-theme="night"] .primary-link {
   position: fixed;
   inset: 0;
   z-index: 5;
-  display: grid;
-  place-items: center;
+  display: block;
   padding: 76px clamp(18px, 4vw, 58px) 56px;
   opacity: 0;
   visibility: hidden;
   transform: translateY(18px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: none;
   transition:
     opacity 380ms ease,
     transform 380ms ease,
@@ -418,10 +420,13 @@ body[data-theme="night"] .overview {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+  pointer-events: auto;
 }
 
 .overview-inner {
   width: min(1180px, 100%);
+  margin: 0 auto;
+  padding-bottom: 48px;
 }
 
 .overview h2 {
@@ -726,7 +731,7 @@ body[data-theme="night"] .archive-card {
   }
 
   .chapter-intro {
-    top: 12vh;
+    top: 50%;
   }
 
   .book-panel {

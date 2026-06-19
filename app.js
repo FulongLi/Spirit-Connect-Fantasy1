@@ -143,16 +143,16 @@ const uiText = {
     htmlLang: "zh-CN",
     navOverview: "档案总览",
     navStory: "故事线",
-    brand: "灵接幻想",
+    brand: "临界幻想",
     day: "白天",
     night: "夜间",
     enter: "进入小说档案",
     introEyebrow: "另一个世界 · 叙事档案馆",
-    introTitle: "灵接幻想",
+    introTitle: "临界幻想",
     introBody:
       "六座灵接舱，六本正在醒来的书。镜头会从中央环形大厅进入每一座舱，展示书卷封面、核心概念与后续阅读入口。",
-    archiveEyebrow: "ARCHIVE INDEX",
-    archiveTitle: "Spirit Connect Fantasy 书卷序列",
+    archiveEyebrow: "档案索引",
+    archiveTitle: "书卷序列",
     archiveLead:
       "已挂入现有封面资源；英文封面暂缺的书卷会先使用中文封面，之后你替换文件即可继续扩展。",
     views: ["书卷总览", "故事线", "关系图谱"],
@@ -160,7 +160,7 @@ const uiText = {
     storyHint: "故事线正在生成……点击任意节点查看事件。",
     graphHint: "点击节点查看说明；悬停可高亮它的所有连接。",
     mainLine: "主线",
-    footerCopy: "© 2026 灵接幻想 · Spirit Connect Fantasy. All rights reserved.",
+    footerCopy: "© 2026 临界幻想。版权所有。",
     reservedPrefix: "预留舱",
     reservedText: "后续卷宗入口预留。",
   },
@@ -665,13 +665,8 @@ function buildCapsules() {
     rim.scale.set(1, 1.58, 1);
     pod.add(rim);
 
-    const marker = makeTextSprite(book ? book.glyph.zh : String(i + 1).padStart(2, "0"), book?.accent || "#8da1b3");
-    marker.position.set(0, 22, 0);
-    marker.scale.set(14, 14, 1);
-    pod.add(marker);
-
     group.add(pod);
-    items.push({ pod, book, marker, rimMat });
+    items.push({ pod, book, rimMat });
   }
   root.add(group);
   return items;
@@ -814,6 +809,14 @@ function wireControls() {
   els.finalViewButtons.forEach((btn) => {
     btn.addEventListener("click", () => showFinalView(btn.dataset.finalView));
   });
+  els.navOverview.addEventListener("click", (ev) => {
+    ev.preventDefault();
+    jumpToFinal("archive");
+  });
+  els.navStory.addEventListener("click", (ev) => {
+    ev.preventDefault();
+    jumpToFinal("storyline");
+  });
 }
 
 function applyLanguage(next) {
@@ -839,12 +842,6 @@ function applyLanguage(next) {
   els.langButtons.forEach((btn) => btn.classList.toggle("is-active", btn.dataset.lang === language));
   els.modeButtons.forEach((btn) => {
     btn.textContent = btn.dataset.mode === "day" ? copy.day : copy.night;
-  });
-  capsules?.forEach((item) => {
-    if (!item.book) return;
-    item.marker.material.map.dispose();
-    const newMarker = makeTextSprite(item.book.glyph[language] || item.book.glyph.zh, item.book.accent);
-    item.marker.material = newMarker.material;
   });
   bookSprites?.forEach((sprite, i) => {
     sprite.material.map = getTexture(getCover(cabinBooks[i]));
@@ -917,6 +914,12 @@ function showFinalView(view) {
     setupGraph();
     drawRelationGraph();
   }
+}
+
+function jumpToFinal(view) {
+  showFinalView(view);
+  scrollStage.scrollTop = scrollStage.scrollHeight - scrollStage.clientHeight;
+  onScroll();
 }
 
 function storyNodeText(node) {
@@ -1144,8 +1147,8 @@ function relaxGraph(iterations) {
 
 function graphToScreen(node, rect) {
   return {
-    x: rect.width / 2 + (node.x - graphCamera.x) * graphCamera.k,
-    y: rect.height / 2 + (node.y - graphCamera.y) * graphCamera.k,
+    x: rect.width / 2 + ((node.rx ?? node.x) - graphCamera.x) * graphCamera.k,
+    y: rect.height / 2 + ((node.ry ?? node.y) - graphCamera.y) * graphCamera.k,
   };
 }
 
@@ -1172,6 +1175,26 @@ function pickGraphNode(ev) {
     }
   });
   return best;
+}
+
+function applyGraphHoverMotion(focus, linked) {
+  const t = performance.now() * 0.0028;
+  graphNodes.forEach((node, i) => {
+    let tx = node.x;
+    let ty = node.y;
+    if (focus && node !== focus && linked.has(node.id)) {
+      let dx = node.x - focus.x;
+      let dy = node.y - focus.y;
+      const d = Math.hypot(dx, dy) || 1;
+      dx /= d;
+      dy /= d;
+      const wave = 9 + Math.sin(t + i * 0.9) * 4;
+      tx += dx * wave;
+      ty += dy * wave;
+    }
+    node.rx = (node.rx ?? node.x) + (tx - (node.rx ?? node.x)) * 0.2;
+    node.ry = (node.ry ?? node.y) + (ty - (node.ry ?? node.y)) * 0.2;
+  });
 }
 
 function onGraphPointerDown(ev) {
@@ -1277,6 +1300,7 @@ function drawRelationGraph() {
       if (b === focus.id) linked.add(a);
     });
   }
+  applyGraphHoverMotion(focus, linked);
 
   graphLinks.forEach(([aId, bId]) => {
     const a = byId[aId];
@@ -1353,14 +1377,18 @@ function fadeWindow(p, start, end) {
 
 function updateDom(p) {
   railDot.style.top = `${p * 100}%`;
-  const introOpacity = fadeWindow(p, 0, 0.105);
+  const introOpacity = p <= 0.105 ? 1 - p / 0.105 : 0;
   intro.classList.toggle("is-visible", introOpacity > 0.02);
   intro.style.opacity = introOpacity.toFixed(3);
   const panelOpacity = fadeWindow(p, 0.11, 0.78);
   panel.classList.toggle("is-visible", panelOpacity > 0.02);
   panel.style.opacity = panelOpacity.toFixed(3);
   panel.style.transform = `translate(-50%, ${-42 + (1 - panelOpacity) * 4}%)`;
-  overview.classList.toggle("is-visible", p >= 0.82);
+  const overviewVisible = p >= 0.82;
+  overview.classList.toggle("is-visible", overviewVisible);
+  overview.style.opacity = overviewVisible ? "1" : "0";
+  overview.style.visibility = overviewVisible ? "visible" : "hidden";
+  overview.style.transform = overviewVisible ? "translateY(0)" : "translateY(18px)";
 
   if (p >= 0.11 && p < 0.78) {
     const local = (p - 0.11) / 0.67;
@@ -1423,14 +1451,20 @@ function clamp(n, min = 0, max = 1) {
 function onScroll() {
   const max = scrollStage.scrollHeight - scrollStage.clientHeight;
   progressTarget = max > 0 ? scrollStage.scrollTop / max : 0;
+  if (progressTarget > 0.985) {
+    progress = progressTarget;
+    updateDom(progress);
+  }
 }
 
 function onWheel(ev) {
   if (ev.ctrlKey) return;
   if (ev.target?.closest?.(".graph-wrap")) return;
+  if (ev.target?.closest?.(".overview")) return;
   ev.preventDefault();
   const factor = ev.deltaMode === 1 ? 33 : ev.deltaMode === 2 ? window.innerHeight : 1;
   scrollStage.scrollTop += ev.deltaY * factor;
+  onScroll();
 }
 
 function onResize() {
@@ -1456,9 +1490,13 @@ scrollStage.addEventListener("scroll", onScroll, { passive: true });
 function animate() {
   const dt = Math.min(clock.getDelta(), 0.05);
   const elapsed = clock.elapsedTime;
+  onScroll();
   progress += (progressTarget - progress) * Math.min(1, dt * 1.75);
   updateDom(progress);
   updateScene(dt, elapsed);
+  if (hoveredGraphNode && document.getElementById("final-graph")?.classList.contains("is-active")) {
+    drawRelationGraph();
+  }
   composer.render();
   requestAnimationFrame(animate);
 }
