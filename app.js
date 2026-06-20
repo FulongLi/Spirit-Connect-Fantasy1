@@ -98,6 +98,10 @@ const books = [
   },
 ];
 
+const soulVolumeIndex = books.findIndex((book) => book.id === "home-soul");
+const soulVolume = soulVolumeIndex >= 0 ? books.splice(soulVolumeIndex, 1)[0] : null;
+if (soulVolume) books.push(soulVolume);
+
 const CABIN_COUNT = 6;
 const cabinBooks = books.slice(0, CABIN_COUNT);
 
@@ -395,6 +399,7 @@ let storyDragging = false;
 let storyPointerStart = null;
 let storyPointerMoved = false;
 let storySuppressClick = false;
+const storyCamera = { x: 0, y: 0, k: 1 };
 
 scrollStage.style.position = "fixed";
 scrollStage.style.inset = "0";
@@ -680,21 +685,7 @@ function buildSpiritLogoCore() {
   particles.userData.phases = phases;
   group.add(particles);
 
-  const verticalBeam = new THREE.Mesh(
-    new THREE.CylinderGeometry(1.2, 1.2, 58, 32, 1, true),
-    new THREE.MeshBasicMaterial({
-      color: "#39d4ff",
-      transparent: true,
-      opacity: 0.08,
-      blending: THREE.AdditiveBlending,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-    })
-  );
-  verticalBeam.position.y = 34;
-  group.add(verticalBeam);
-
-  return { group, layers, floorWaves, particles, verticalBeam };
+  return { group, layers, floorWaves, particles };
 }
 
 function buildCapsules() {
@@ -1058,7 +1049,7 @@ function buildStoryline() {
   svg.setAttribute("class", "story-svg");
   storyEls.canvas.innerHTML = "";
   storyEls.canvas.appendChild(svg);
-  storyEls.canvas.scrollLeft = 0;
+  applyStoryTransform();
 
   const defs = document.createElementNS(ns, "defs");
   defs.innerHTML = `<filter id="storyGlow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
@@ -1149,7 +1140,8 @@ function onStoryPointerDown(ev) {
   storyPointerStart = {
     x: ev.clientX,
     y: ev.clientY,
-    scrollLeft: storyEls.canvas.scrollLeft,
+    cameraX: storyCamera.x,
+    cameraY: storyCamera.y,
   };
   storyEls.canvas.setPointerCapture?.(ev.pointerId);
   storyEls.canvas.classList.add("is-dragging");
@@ -1163,7 +1155,9 @@ function onStoryPointerMove(ev) {
   if (!storyPointerMoved) return;
   ev.preventDefault();
   ev.stopPropagation();
-  storyEls.canvas.scrollLeft = storyPointerStart.scrollLeft - dx;
+  storyCamera.x = storyPointerStart.cameraX + dx;
+  storyCamera.y = storyPointerStart.cameraY + dy;
+  applyStoryTransform();
 }
 
 function onStoryPointerUp(ev) {
@@ -1181,10 +1175,24 @@ function onStoryPointerUp(ev) {
 }
 
 function onStoryWheel(ev) {
-  if (Math.abs(ev.deltaX) <= Math.abs(ev.deltaY) && !ev.shiftKey) return;
   ev.preventDefault();
   ev.stopPropagation();
-  storyEls.canvas.scrollLeft += ev.deltaX || ev.deltaY;
+  const rect = storyEls.canvas.getBoundingClientRect();
+  const px = ev.clientX - rect.left;
+  const py = ev.clientY - rect.top;
+  const worldX = (px - storyCamera.x) / storyCamera.k;
+  const worldY = (py - storyCamera.y) / storyCamera.k;
+  const nextK = clamp(storyCamera.k * (ev.deltaY < 0 ? 1.12 : 0.9), 0.55, 2.8);
+  storyCamera.k = nextK;
+  storyCamera.x = px - worldX * nextK;
+  storyCamera.y = py - worldY * nextK;
+  applyStoryTransform();
+}
+
+function applyStoryTransform() {
+  const svg = storyEls.canvas?.querySelector(".story-svg");
+  if (!svg) return;
+  svg.style.transform = `translate(${storyCamera.x}px, ${storyCamera.y}px) scale(${storyCamera.k})`;
 }
 
 function showStoryDetail(book, node, context, group, svg) {
@@ -1647,7 +1655,6 @@ function updateSpiritCore(dt, elapsed) {
   const nightBoost = mode === "night" ? 1 : 0.62;
   const pulse = 0.5 + 0.5 * Math.sin(elapsed * 1.65);
   spiritCore.group.rotation.y += dt * 0.09;
-  spiritCore.verticalBeam.material.opacity = (0.045 + pulse * 0.055) * nightBoost;
 
   spiritCore.layers.forEach((sprite) => {
     const shimmer = 1 + Math.sin(elapsed * 1.4 + sprite.userData.phase) * 0.035;

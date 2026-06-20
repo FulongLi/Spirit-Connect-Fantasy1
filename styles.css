@@ -588,6 +588,7 @@ body[data-theme="day"] .story-canvas {
 
 .story-svg {
   display: block;
+  transform-origin: 0 0;
 }
 
 .story-node {
