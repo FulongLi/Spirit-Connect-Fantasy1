@@ -32,8 +32,8 @@ const books = [
     cover: { zh: "assets/WF_cn.png", en: "assets/WF_en.png" },
     link: "novels/whale-fall/",
     description: {
-      zh: "查理在一具陌生身体里醒来，站在尸体堆成的山上，看见一头燃烧的巨鲸从天而降。它像星舰，也像一个文明的记忆本身正在坠落。",
-      en: "Charlie wakes inside a stranger's body on a mountain of the dead, as a burning whale falls from the sky like a starship and a civilization's memory.",
+      zh: "遍览古代文明，人类像猴子一样几千年没有成长。阿卡西的海洋像雨水一样浇灌在每一位智人的头顶，没有高一级的文明介入，就算淹死，猴子依然是猴子。",
+      en: "Across the sweep of ancient civilizations, humanity has remained like apes, unchanged for thousands of years. The ocean of Akasha falls like rain upon every Homo sapiens, yet without the intervention of a higher civilization, even if drowned, an ape remains an ape.",
     },
   },
   {
