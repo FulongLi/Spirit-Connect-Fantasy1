@@ -27,14 +27,12 @@ If the preview server is not running, serve this folder with any static HTTP ser
 
 - `assets/`  
   Novel cover images. Current mapping:
-  - `DM.png` / `DM_E.png` — 月球暗面 / Darkside of the Moon
-  - `WF1.png` / `WF.png` — 巨鲸陨落 / Whale Fall
-  - `MC.png` — 灵猫 / Mystic Cat
-  - `DC1.png` — 生死邮轮 / Death Cruise
-  - `HS.png` — 灵魂归处 / Where Souls Return
-  - `LD.png` — 浅窥命运 / A Glimpse of Fate
-  - `LS.png` — 演讲迷宫 / Lecture Maze
-  - `ZD.png` — 零域之境 / Zero Domain
+  - `DM_cn.png` / `DM_en.png` — 月球暗面 / Darkside of the Moon
+  - `WF_cn.png` / `WF_en.png` — 巨鲸陨落 / Whale Fall
+  - `MC_cn.png` / `MC_en.png` — 灵猫 / Mystic Cat
+  - `CC_cn.png` / `CC_en.png` — 血色邮轮 / The Crimson Cruise
+  - `WSR_cn.png` / `WSR_en.png` — 灵魂归处 / Where Souls Return
+  - `SL_cn.png` / `SL_en.png` — 时空迷宫 / Spacetime Labyrinth
 
 ## Features
 
