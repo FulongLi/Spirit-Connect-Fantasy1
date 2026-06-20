@@ -15,7 +15,7 @@ const books = [
     theme: { zh: "意识迁出 · 死球理论", en: "Consciousness Exodus · Dead Moon Theory" },
     accent: "#2bb8ff",
     cover: { zh: "assets/DM_cn.png", en: "assets/DM_en.png" },
-    link: "fantasy-content/zh/anotherworld/storylines.md",
+    link: "novels/dark-moon/",
     description: {
       zh: "2118 年，吉姆·维尔走进灵接舱进行第二次数字矫正，却带回了不属于自己的记忆。月球暗面的古老记录系统、数字双生体与 LUNA-EXIT 计划开始浮出水面。",
       en: "In 2118, Jim Vale enters a Spirit Connect cabin for his second digital calibration and returns with memories that are not his own. The hidden archive on the Moon begins to open.",
@@ -30,7 +30,7 @@ const books = [
     theme: { zh: "文明遗产 · 鲸歌回声", en: "Civilization Relic · Whale Echo" },
     accent: "#4da3ff",
     cover: { zh: "assets/WF_cn.png", en: "assets/WF_en.png" },
-    link: "fantasy-content/zh/spicopedia/whale-echo.md",
+    link: "novels/whale-fall/",
     description: {
       zh: "查理在一具陌生身体里醒来，站在尸体堆成的山上，看见一头燃烧的巨鲸从天而降。它像星舰，也像一个文明的记忆本身正在坠落。",
       en: "Charlie wakes inside a stranger's body on a mountain of the dead, as a burning whale falls from the sky like a starship and a civilization's memory.",
@@ -45,7 +45,7 @@ const books = [
     theme: { zh: "动物意识 · 时间井", en: "Animal Consciousness · Time Well" },
     accent: "#e2a72b",
     cover: { zh: "assets/MC_cn.png", en: "assets/MC_en.png" },
-    link: "fantasy-content/zh/anotherworld/storylines.md",
+    link: "novels/mystic-cat/",
     description: {
       zh: "安娜被困在非人类意识区域。记录边缘的森林里，有一只能够直视意识的猫影；那里的时间不走直线。",
       en: "Anna is trapped in a non-human consciousness region. At the edge of the archive, a cat-shaped shadow can look directly into the mind.",
@@ -60,7 +60,7 @@ const books = [
     theme: { zh: "邮轮 · 轮回 · 失踪航线", en: "Cruise · Rebirth · Missing Route" },
     accent: "#ff4f9a",
     cover: { zh: "assets/CC_cn.png", en: "assets/CC_en.png" },
-    link: "#",
+    link: "novels/crimson-cruise/",
     description: {
       zh: "一艘驶向未知海域的邮轮，把生者、死者和未完成的记忆带进同一条航线。",
       en: "A cruise ship sails beyond the mapped ocean, carrying the living, the dead, and unfinished memories on the same route.",
@@ -75,7 +75,7 @@ const books = [
     theme: { zh: "归乡 · 意识余辉", en: "Return · Afterglow" },
     accent: "#42d6ff",
     cover: { zh: "assets/WSR_cn.png", en: "assets/WSR_en.png" },
-    link: "#",
+    link: "novels/where-souls-return/",
     description: {
       zh: "当身体和数字人格都不能回答“我是谁”，灵魂也许会寻找第三个归处。",
       en: "When neither body nor digital persona can answer who you are, the soul may search for a third place to return.",
@@ -90,7 +90,7 @@ const books = [
     theme: { zh: "时空 · 迷宫 · 认知回环", en: "Spacetime · Labyrinth · Cognitive Loop" },
     accent: "#7ecbff",
     cover: { zh: "assets/SL_cn.png", en: "assets/SL_en.png" },
-    link: "#",
+    link: "novels/spacetime-labyrinth/",
     description: {
       zh: "一座由时间切片、空间回廊和意识错觉共同构成的迷宫。每一次接近出口，都会把人带回另一个入口。",
       en: "A labyrinth built from time slices, spatial corridors, and perceptual loops. Every exit leads back to another entrance.",
@@ -328,6 +328,7 @@ let pointerX = 0;
 let pointerY = 0;
 let smoothPointerX = 0;
 let smoothPointerY = 0;
+let railDragging = false;
 
 const SECTIONS = 12;
 const textureLoader = new THREE.TextureLoader();
@@ -337,6 +338,7 @@ const scrollStage = document.getElementById("scroll-stage");
 const intro = document.querySelector(".chapter-intro");
 const panel = document.querySelector("[data-book-panel]");
 const overview = document.querySelector(".overview");
+const rail = document.querySelector(".rail");
 const railDot = document.getElementById("rail-dot");
 const cover = document.getElementById("book-cover");
 const glyph = document.getElementById("book-glyph");
@@ -1503,6 +1505,38 @@ function onOverviewWheel(ev) {
   }
 }
 
+function setScrollFromRail(clientY) {
+  const rect = rail.getBoundingClientRect();
+  const ratio = clamp((clientY - rect.top) / rect.height);
+  const max = scrollStage.scrollHeight - scrollStage.clientHeight;
+  scrollStage.scrollTop = ratio * max;
+  progressTarget = ratio;
+  progress = ratio;
+  updateDom(progress);
+}
+
+function onRailPointerDown(ev) {
+  ev.preventDefault();
+  ev.stopPropagation();
+  railDragging = true;
+  rail.classList.add("is-dragging");
+  rail.setPointerCapture?.(ev.pointerId);
+  setScrollFromRail(ev.clientY);
+}
+
+function onRailPointerMove(ev) {
+  if (!railDragging) return;
+  ev.preventDefault();
+  setScrollFromRail(ev.clientY);
+}
+
+function onRailPointerUp(ev) {
+  if (!railDragging) return;
+  railDragging = false;
+  rail.classList.remove("is-dragging");
+  rail.releasePointerCapture?.(ev.pointerId);
+}
+
 function onResize() {
   const w = window.innerWidth;
   const h = window.innerHeight;
@@ -1523,6 +1557,10 @@ window.addEventListener("pointermove", (ev) => {
 });
 scrollStage.addEventListener("scroll", onScroll, { passive: true });
 overview.addEventListener("wheel", onOverviewWheel, { passive: false });
+rail.addEventListener("pointerdown", onRailPointerDown);
+rail.addEventListener("pointermove", onRailPointerMove);
+rail.addEventListener("pointerup", onRailPointerUp);
+rail.addEventListener("pointercancel", onRailPointerUp);
 
 function animate() {
   const dt = Math.min(clock.getDelta(), 0.05);
