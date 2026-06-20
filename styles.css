@@ -450,7 +450,9 @@ body[data-theme="night"] .overview {
 }
 
 .overview h2 {
-  max-width: 16ch;
+  max-width: 650px;
+  margin-inline: auto;
+  text-align: left;
 }
 
 .archive-grid {

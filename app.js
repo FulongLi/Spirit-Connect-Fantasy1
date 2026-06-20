@@ -576,19 +576,6 @@ function buildEnvironment() {
   dome.scale.y = 0.82;
   root.add(dome);
 
-  const ribRadius = 314;
-  const ribHeight = 254;
-  const ribMat = new THREE.LineBasicMaterial({ color: "#6e879b", transparent: true, opacity: 0.3 });
-  ribMat.name = "rib-line";
-  for (let i = 0; i < 24; i++) {
-    const curve = new THREE.EllipseCurve(0, 0, ribRadius, ribHeight, 0, Math.PI, false);
-    const pts = curve.getPoints(80).map((p) => new THREE.Vector3(p.x, p.y - 8, 0));
-    const geo = new THREE.BufferGeometry().setFromPoints(pts);
-    const line = new THREE.Line(geo, ribMat);
-    line.rotation.y = (i / 24) * Math.PI * 2;
-    root.add(line);
-  }
-
   const core = new THREE.Mesh(new THREE.CylinderGeometry(26, 34, 8, 72), mats.pearl);
   core.position.y = 4;
   core.castShadow = true;
