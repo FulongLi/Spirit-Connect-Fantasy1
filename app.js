@@ -391,6 +391,10 @@ let graphDraggingNode = null;
 let graphPanning = false;
 let graphLastPointer = null;
 let graphPointerMoved = false;
+let storyDragging = false;
+let storyPointerStart = null;
+let storyPointerMoved = false;
+let storySuppressClick = false;
 
 scrollStage.style.position = "fixed";
 scrollStage.style.inset = "0";
@@ -471,7 +475,6 @@ const posCurve = new THREE.CatmullRomCurve3(camPositions.map((p) => new THREE.Ve
 const targetCurve = new THREE.CatmullRomCurve3(camTargets.map((p) => new THREE.Vector3(...p)), false, "centripetal");
 const camPos = new THREE.Vector3();
 const camTarget = new THREE.Vector3();
-const coreLookTarget = new THREE.Vector3();
 const clock = new THREE.Clock();
 
 function cabinAngle(index) {
@@ -624,18 +627,6 @@ function buildSpiritLogoCore() {
     layers.push(sprite);
   });
 
-  const plateMat = new THREE.MeshBasicMaterial({
-    color: "#31caff",
-    transparent: true,
-    opacity: 0.1,
-    blending: THREE.AdditiveBlending,
-    side: THREE.DoubleSide,
-    depthWrite: false,
-  });
-  const backPlate = new THREE.Mesh(new THREE.PlaneGeometry(54, 44), plateMat);
-  backPlate.position.set(0, 37, -3);
-  group.add(backPlate);
-
   const floorWaves = [];
   for (let i = 0; i < 5; i++) {
     const mat = new THREE.MeshBasicMaterial({
@@ -651,22 +642,6 @@ function buildSpiritLogoCore() {
     ring.userData.phase = i / 5;
     group.add(ring);
     floorWaves.push(ring);
-  }
-
-  const haloRings = [];
-  for (let i = 0; i < 3; i++) {
-    const mat = new THREE.MeshBasicMaterial({
-      color: i === 1 ? "#ffffff" : "#49d6ff",
-      transparent: true,
-      opacity: i === 1 ? 0.12 : 0.2,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    const halo = new THREE.Mesh(new THREE.TorusGeometry(25 + i * 4.6, 0.14, 8, 160), mat);
-    halo.position.set(0, 37, -2 - i * 0.3);
-    halo.userData.phase = i * 0.33;
-    group.add(halo);
-    haloRings.push(halo);
   }
 
   const particleCount = 280;
@@ -719,7 +694,7 @@ function buildSpiritLogoCore() {
   verticalBeam.position.y = 34;
   group.add(verticalBeam);
 
-  return { group, layers, backPlate, floorWaves, haloRings, particles, verticalBeam };
+  return { group, layers, floorWaves, particles, verticalBeam };
 }
 
 function buildCapsules() {
@@ -906,6 +881,7 @@ function makeTextSprite(text, color) {
 function wireControls() {
   els.langButtons.forEach((btn) => btn.addEventListener("click", () => applyLanguage(btn.dataset.lang)));
   els.modeButtons.forEach((btn) => btn.addEventListener("click", () => applyTheme(btn.dataset.mode)));
+  wireStoryPan();
   els.finalViewButtons.forEach((btn) => {
     btn.addEventListener("click", () => showFinalView(btn.dataset.finalView));
   });
@@ -985,6 +961,7 @@ function buildArchive() {
       text: `${book.kicker[language] || book.kicker.zh}。${book.theme[language] || book.theme.zh}。${(book.description[language] || book.description.zh).slice(0, 86)}...`,
       empty: false,
       cover: getCover(book),
+      link: book.link,
     })),
     ...reserved.map((name, i) => ({
       title: `${copy.reservedPrefix} ${String(i + books.length + 1).padStart(2, "0")}`,
@@ -996,11 +973,12 @@ function buildArchive() {
   archiveList.innerHTML = items
     .map(
       (item) => `
-        <article class="archive-card ${item.empty ? "is-empty" : ""}">
+        <${item.link ? `a href="${item.link}"` : "article"} class="archive-card ${item.empty ? "is-empty" : ""}">
           ${item.cover ? `<span class="archive-thumb" style="background-image:url('${item.cover}')"></span>` : ""}
           <strong>${item.title}</strong>
           <p>${item.text}</p>
-        </article>
+          ${item.link ? `<span class="archive-card-link">${copy.enter}</span>` : ""}
+        </${item.link ? "a" : "article"}>
       `
     )
     .join("");
@@ -1080,6 +1058,7 @@ function buildStoryline() {
   svg.setAttribute("class", "story-svg");
   storyEls.canvas.innerHTML = "";
   storyEls.canvas.appendChild(svg);
+  storyEls.canvas.scrollLeft = 0;
 
   const defs = document.createElementNS(ns, "defs");
   defs.innerHTML = `<filter id="storyGlow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
@@ -1109,7 +1088,13 @@ function buildStoryline() {
     add("circle", { cx: x, cy: Y, r: 6, fill: "#0f1b2d", stroke: book.accent, "stroke-width": 2, class: "story-dot", filter: "url(#storyGlow)" }, group);
     const text = add("text", { x, y: above ? Y - 22 : Y + 36, "text-anchor": "middle", class: "story-label" }, group);
     text.textContent = node.t;
-    group.addEventListener("click", () => showStoryDetail(book, node, copy.mainLine, group, svg));
+    group.addEventListener("click", (ev) => {
+      if (storySuppressClick) {
+        ev.preventDefault();
+        return;
+      }
+      showStoryDetail(book, node, copy.mainLine, group, svg);
+    });
   });
 
   branchData.forEach((branch) => {
@@ -1134,11 +1119,72 @@ function buildStoryline() {
       add("circle", { cx: x, cy: by, r: 4.7, fill: "#0f1b2d", stroke: book.accent, "stroke-width": 1.6, class: "story-dot" }, group);
       const text = add("text", { x, y: dir < 0 ? by - 14 : by + 24, "text-anchor": "middle", class: "story-label story-label-small" }, group);
       text.textContent = node.t;
-      group.addEventListener("click", () => showStoryDetail(book, node, branch.labelText, group, svg));
+      group.addEventListener("click", (ev) => {
+        if (storySuppressClick) {
+          ev.preventDefault();
+          return;
+        }
+        showStoryDetail(book, node, branch.labelText, group, svg);
+      });
     });
   });
 
   storyEls.detail.innerHTML = `<p>${copy.storyHint}</p>`;
+}
+
+function wireStoryPan() {
+  if (!storyEls.canvas || storyEls.canvas.dataset.panWired) return;
+  storyEls.canvas.dataset.panWired = "true";
+  storyEls.canvas.addEventListener("pointerdown", onStoryPointerDown);
+  storyEls.canvas.addEventListener("pointermove", onStoryPointerMove);
+  storyEls.canvas.addEventListener("pointerup", onStoryPointerUp);
+  storyEls.canvas.addEventListener("pointercancel", onStoryPointerUp);
+  storyEls.canvas.addEventListener("wheel", onStoryWheel, { passive: false });
+}
+
+function onStoryPointerDown(ev) {
+  if (ev.button !== undefined && ev.button !== 0) return;
+  storyDragging = true;
+  storyPointerMoved = false;
+  storyPointerStart = {
+    x: ev.clientX,
+    y: ev.clientY,
+    scrollLeft: storyEls.canvas.scrollLeft,
+  };
+  storyEls.canvas.setPointerCapture?.(ev.pointerId);
+  storyEls.canvas.classList.add("is-dragging");
+}
+
+function onStoryPointerMove(ev) {
+  if (!storyDragging || !storyPointerStart) return;
+  const dx = ev.clientX - storyPointerStart.x;
+  const dy = ev.clientY - storyPointerStart.y;
+  if (Math.hypot(dx, dy) > 4) storyPointerMoved = true;
+  if (!storyPointerMoved) return;
+  ev.preventDefault();
+  ev.stopPropagation();
+  storyEls.canvas.scrollLeft = storyPointerStart.scrollLeft - dx;
+}
+
+function onStoryPointerUp(ev) {
+  if (!storyDragging) return;
+  storyDragging = false;
+  storyPointerStart = null;
+  storyEls.canvas.releasePointerCapture?.(ev.pointerId);
+  storyEls.canvas.classList.remove("is-dragging");
+  if (storyPointerMoved) {
+    storySuppressClick = true;
+    window.setTimeout(() => {
+      storySuppressClick = false;
+    }, 0);
+  }
+}
+
+function onStoryWheel(ev) {
+  if (Math.abs(ev.deltaX) <= Math.abs(ev.deltaY) && !ev.shiftKey) return;
+  ev.preventDefault();
+  ev.stopPropagation();
+  storyEls.canvas.scrollLeft += ev.deltaX || ev.deltaY;
 }
 
 function showStoryDetail(book, node, context, group, svg) {
@@ -1613,10 +1659,6 @@ function updateSpiritCore(dt, elapsed) {
     sprite.material.opacity = sprite.userData.baseOpacity * nightBoost * (0.86 + pulse * 0.14);
   });
 
-  coreLookTarget.set(camera.position.x, 37, camera.position.z);
-  spiritCore.backPlate.lookAt(coreLookTarget);
-  spiritCore.backPlate.material.opacity = (0.07 + pulse * 0.05) * nightBoost;
-
   spiritCore.floorWaves.forEach((ring, i) => {
     const phase = (elapsed * 0.28 + ring.userData.phase) % 1;
     const scale = 0.56 + phase * 1.72;
@@ -1624,14 +1666,6 @@ function updateSpiritCore(dt, elapsed) {
     ring.position.y = 15.5 + phase * 11.5;
     ring.material.opacity = (mode === "night" ? 0.34 : 0.18) * (1 - phase);
     ring.rotation.z += dt * (0.12 + i * 0.025);
-  });
-
-  spiritCore.haloRings.forEach((halo, i) => {
-    const wave = 0.5 + 0.5 * Math.sin(elapsed * 1.1 + halo.userData.phase * Math.PI * 2);
-    halo.lookAt(coreLookTarget);
-    halo.rotateZ(elapsed * (0.11 + i * 0.04));
-    halo.scale.setScalar(1 + wave * 0.045);
-    halo.material.opacity = (i === 1 ? 0.1 : 0.18) * nightBoost * (0.72 + wave * 0.28);
   });
 
   const attr = spiritCore.particles.geometry.getAttribute("position");
