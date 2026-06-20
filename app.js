@@ -282,22 +282,22 @@ const graphLinks = [["b1","jim"],["b1","e2118"],["b1","elara"],["b1","terasa"],[
 
 const themes = {
   day: {
-    bg: "#ece5d8",
-    fog: "#eee7dc",
-    fogNear: 230,
-    fogFar: 760,
+    bg: "#eee8dc",
+    fog: "#f2eee6",
+    fogNear: 420,
+    fogFar: 1200,
     floor: "#c9c0b0",
     shell: "#b9c0c6",
     pearl: "#8e9aa5",
-    glass: "#6fc6e5",
+    glass: "#55b5d7",
     darkGlass: "#263b4d",
     rail: "#66717a",
     hemiSky: "#f8f1e5",
     hemiGround: "#5d6570",
-    hemiIntensity: 1.08,
-    keyIntensity: 2.55,
-    env: 0.38,
-    bloom: 0.42,
+    hemiIntensity: 1.14,
+    keyIntensity: 2.72,
+    env: 0.3,
+    bloom: 0.28,
   },
   night: {
     bg: "#04080f",
@@ -805,7 +805,7 @@ function applyLanguage(next) {
   els.brand.textContent = copy.brand;
   els.introEyebrow.textContent = copy.introEyebrow;
   els.introTitle.textContent = copy.introTitle;
-  els.introBody.textContent = copy.introBody;
+  if (els.introBody) els.introBody.textContent = copy.introBody;
   els.archiveEyebrow.textContent = copy.archiveEyebrow;
   els.archiveTitle.textContent = copy.archiveTitle;
   els.archiveLead.textContent = copy.archiveLead;
