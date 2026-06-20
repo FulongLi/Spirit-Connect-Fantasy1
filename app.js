@@ -329,6 +329,7 @@ let pointerY = 0;
 let smoothPointerX = 0;
 let smoothPointerY = 0;
 let railDragging = false;
+let spiritCore = null;
 
 const SECTIONS = 12;
 const textureLoader = new THREE.TextureLoader();
@@ -470,6 +471,7 @@ const posCurve = new THREE.CatmullRomCurve3(camPositions.map((p) => new THREE.Ve
 const targetCurve = new THREE.CatmullRomCurve3(camTargets.map((p) => new THREE.Vector3(...p)), false, "centripetal");
 const camPos = new THREE.Vector3();
 const camTarget = new THREE.Vector3();
+const coreLookTarget = new THREE.Vector3();
 const clock = new THREE.Clock();
 
 function cabinAngle(index) {
@@ -586,6 +588,138 @@ function buildEnvironment() {
   coreRing.rotation.x = Math.PI / 2;
   coreRing.position.y = 9.2;
   root.add(coreRing);
+
+  spiritCore = buildSpiritLogoCore();
+  root.add(spiritCore.group);
+}
+
+function buildSpiritLogoCore() {
+  const group = new THREE.Group();
+  group.name = "spirit-logo-core";
+
+  const logoTexture = getTexture("assets/spirit-connect-logo.png");
+  const layers = [];
+  const layerSettings = [
+    { scale: [50, 41], opacity: 0.16, color: "#49d6ff", z: -2.2 },
+    { scale: [42, 34], opacity: 0.28, color: "#7fe6ff", z: -1.1 },
+    { scale: [34, 28], opacity: 0.96, color: "#eafbff", z: 0 },
+  ];
+
+  layerSettings.forEach((setting, index) => {
+    const mat = new THREE.SpriteMaterial({
+      map: logoTexture,
+      color: setting.color,
+      transparent: true,
+      opacity: setting.opacity,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const sprite = new THREE.Sprite(mat);
+    sprite.position.set(0, 37, setting.z);
+    sprite.scale.set(setting.scale[0], setting.scale[1], 1);
+    sprite.userData.baseScale = setting.scale;
+    sprite.userData.baseOpacity = setting.opacity;
+    sprite.userData.phase = index * 0.7;
+    group.add(sprite);
+    layers.push(sprite);
+  });
+
+  const plateMat = new THREE.MeshBasicMaterial({
+    color: "#31caff",
+    transparent: true,
+    opacity: 0.1,
+    blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+  });
+  const backPlate = new THREE.Mesh(new THREE.PlaneGeometry(54, 44), plateMat);
+  backPlate.position.set(0, 37, -3);
+  group.add(backPlate);
+
+  const floorWaves = [];
+  for (let i = 0; i < 5; i++) {
+    const mat = new THREE.MeshBasicMaterial({
+      color: i % 2 ? "#8fefff" : "#27bdff",
+      transparent: true,
+      opacity: 0.26,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(25, 0.16, 8, 144), mat);
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = 16 + i * 1.2;
+    ring.userData.phase = i / 5;
+    group.add(ring);
+    floorWaves.push(ring);
+  }
+
+  const haloRings = [];
+  for (let i = 0; i < 3; i++) {
+    const mat = new THREE.MeshBasicMaterial({
+      color: i === 1 ? "#ffffff" : "#49d6ff",
+      transparent: true,
+      opacity: i === 1 ? 0.12 : 0.2,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const halo = new THREE.Mesh(new THREE.TorusGeometry(25 + i * 4.6, 0.14, 8, 160), mat);
+    halo.position.set(0, 37, -2 - i * 0.3);
+    halo.userData.phase = i * 0.33;
+    group.add(halo);
+    haloRings.push(halo);
+  }
+
+  const particleCount = 280;
+  const pos = new Float32Array(particleCount * 3);
+  const colors = new Float32Array(particleCount * 3);
+  const phases = new Float32Array(particleCount);
+  const cyan = new THREE.Color("#6ce8ff");
+  const white = new THREE.Color("#ffffff");
+  for (let i = 0; i < particleCount; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const r = 6 + Math.random() * 34;
+    const y = 16 + Math.random() * 48;
+    const b = i * 3;
+    pos[b] = Math.cos(a) * r;
+    pos[b + 1] = y;
+    pos[b + 2] = Math.sin(a) * r * 0.62;
+    const c = cyan.clone().lerp(white, Math.random() * 0.35);
+    colors[b] = c.r;
+    colors[b + 1] = c.g;
+    colors[b + 2] = c.b;
+    phases[i] = Math.random() * Math.PI * 2;
+  }
+  const particleGeo = new THREE.BufferGeometry();
+  particleGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  particleGeo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  const particleMat = new THREE.PointsMaterial({
+    size: 0.74,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.46,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
+  const particles = new THREE.Points(particleGeo, particleMat);
+  particles.userData.base = pos.slice();
+  particles.userData.phases = phases;
+  group.add(particles);
+
+  const verticalBeam = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.2, 1.2, 58, 32, 1, true),
+    new THREE.MeshBasicMaterial({
+      color: "#39d4ff",
+      transparent: true,
+      opacity: 0.08,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    })
+  );
+  verticalBeam.position.y = 34;
+  group.add(verticalBeam);
+
+  return { group, layers, backPlate, floorWaves, haloRings, particles, verticalBeam };
 }
 
 function buildCapsules() {
@@ -1458,6 +1592,61 @@ function updateScene(dt, elapsed) {
     sprite.scale.set(18 * nextScale, 27 * nextScale, 1);
     sprite.lookAt(camera.position);
   });
+  updateSpiritCore(dt, elapsed);
+}
+
+function updateSpiritCore(dt, elapsed) {
+  if (!spiritCore) return;
+
+  const nightBoost = mode === "night" ? 1 : 0.62;
+  const pulse = 0.5 + 0.5 * Math.sin(elapsed * 1.65);
+  spiritCore.group.rotation.y += dt * 0.09;
+  spiritCore.verticalBeam.material.opacity = (0.045 + pulse * 0.055) * nightBoost;
+
+  spiritCore.layers.forEach((sprite) => {
+    const shimmer = 1 + Math.sin(elapsed * 1.4 + sprite.userData.phase) * 0.035;
+    sprite.scale.set(
+      sprite.userData.baseScale[0] * shimmer,
+      sprite.userData.baseScale[1] * shimmer,
+      1
+    );
+    sprite.material.opacity = sprite.userData.baseOpacity * nightBoost * (0.86 + pulse * 0.14);
+  });
+
+  coreLookTarget.set(camera.position.x, 37, camera.position.z);
+  spiritCore.backPlate.lookAt(coreLookTarget);
+  spiritCore.backPlate.material.opacity = (0.07 + pulse * 0.05) * nightBoost;
+
+  spiritCore.floorWaves.forEach((ring, i) => {
+    const phase = (elapsed * 0.28 + ring.userData.phase) % 1;
+    const scale = 0.56 + phase * 1.72;
+    ring.scale.set(scale, scale, scale);
+    ring.position.y = 15.5 + phase * 11.5;
+    ring.material.opacity = (mode === "night" ? 0.34 : 0.18) * (1 - phase);
+    ring.rotation.z += dt * (0.12 + i * 0.025);
+  });
+
+  spiritCore.haloRings.forEach((halo, i) => {
+    const wave = 0.5 + 0.5 * Math.sin(elapsed * 1.1 + halo.userData.phase * Math.PI * 2);
+    halo.lookAt(coreLookTarget);
+    halo.rotateZ(elapsed * (0.11 + i * 0.04));
+    halo.scale.setScalar(1 + wave * 0.045);
+    halo.material.opacity = (i === 1 ? 0.1 : 0.18) * nightBoost * (0.72 + wave * 0.28);
+  });
+
+  const attr = spiritCore.particles.geometry.getAttribute("position");
+  const base = spiritCore.particles.userData.base;
+  const phases = spiritCore.particles.userData.phases;
+  for (let i = 0; i < phases.length; i++) {
+    const b = i * 3;
+    const phase = elapsed * 1.15 + phases[i];
+    const radial = 1 + Math.sin(phase * 0.7) * 0.028;
+    attr.array[b] = base[b] * radial;
+    attr.array[b + 1] = base[b + 1] + Math.sin(phase) * 1.15;
+    attr.array[b + 2] = base[b + 2] * radial + Math.cos(phase * 0.83) * 0.7;
+  }
+  attr.needsUpdate = true;
+  spiritCore.particles.material.opacity = (mode === "night" ? 0.5 : 0.26) * (0.78 + pulse * 0.22);
 }
 
 function clamp(n, min = 0, max = 1) {
