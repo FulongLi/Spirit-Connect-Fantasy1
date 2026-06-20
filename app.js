@@ -576,10 +576,12 @@ function buildEnvironment() {
   dome.scale.y = 0.82;
   root.add(dome);
 
-  const ribMat = new THREE.LineBasicMaterial({ color: "#6e879b", transparent: true, opacity: 0.28 });
+  const ribRadius = 314;
+  const ribHeight = 254;
+  const ribMat = new THREE.LineBasicMaterial({ color: "#6e879b", transparent: true, opacity: 0.3 });
   ribMat.name = "rib-line";
   for (let i = 0; i < 24; i++) {
-    const curve = new THREE.EllipseCurve(0, 0, 282, 232, 0, Math.PI, false);
+    const curve = new THREE.EllipseCurve(0, 0, ribRadius, ribHeight, 0, Math.PI, false);
     const pts = curve.getPoints(80).map((p) => new THREE.Vector3(p.x, p.y - 8, 0));
     const geo = new THREE.BufferGeometry().setFromPoints(pts);
     const line = new THREE.Line(geo, ribMat);
