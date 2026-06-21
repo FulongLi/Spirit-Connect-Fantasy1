@@ -158,7 +158,7 @@
     const toggle = document.getElementById("track-toggle");
     const list = document.getElementById("track-list");
     const ring = document.getElementById("track-ring");
-    const RING_C = 2 * Math.PI * 22;
+    const RING_C = 2 * Math.PI * 20;
 
     function setPlayIcon() {
       playBtn.innerHTML = audio.paused ? ICON_PLAY : ICON_PAUSE;
