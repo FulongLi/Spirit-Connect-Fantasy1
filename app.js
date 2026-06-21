@@ -10,14 +10,14 @@ const books = [
     id: "dark-moon",
     glyph: { zh: "月", en: "DM" },
     title: { zh: "月球暗面", en: "Darkside of the Moon" },
-    kicker: { zh: "档案 I · 第一扇门", en: "Archive I · The First Gate" },
+    kicker: { zh: "档案 I · 挣脱通往真相的第一道枷锁", en: "Archive I · The First Gate" },
     status: { zh: "已出版", en: "Published" },
     theme: { zh: "意识迁出 · 死球理论", en: "Consciousness Exodus · Dead Moon Theory" },
     accent: "#2bb8ff",
     cover: { zh: "assets/DM_cn.png", en: "assets/DM_en.png" },
     link: "novels/dark-moon/",
     description: {
-      zh: "2118 年，吉姆·维尔走进灵接舱进行第二次数字矫正，却带回了不属于自己的记忆。月球暗面的古老记录系统、数字双生体与 LUNA-EXIT 计划开始浮出水面。",
+      zh: "遍览古代文明，人类像猴子一样几千年没有成长。阿卡西的海洋像雨水一样浇灌在每一位智人的颅顶，没有高一级的文明介入，就算淹死，猴子依然是猴子。",
       en: "In 2118, Jim Vale enters a Spirit Connect cabin for his second digital calibration and returns with memories that are not his own. The hidden archive on the Moon begins to open.",
     },
   },
@@ -173,7 +173,7 @@ const storyBooks = [
     glyph: "月",
     accent: "#00e5ff",
     title: { zh: "月球暗面", en: "Darkside of the Moon" },
-    subtitle: { zh: "档案 I · 第一扇门", en: "Archive I · The First Gate" },
+    subtitle: { zh: "档案 I · 挣脱通往真相的第一道枷锁", en: "Archive I · The First Gate" },
     status: { zh: "已出版", en: "Published" },
     nodes: [
       { zh: ["第二次数字矫正", "2118 年，十八岁的吉姆·维尔走进灵接舱，进行人生第二次数字矫正。这一次，有什么东西没有按程序进行。"], en: ["The Second Correction", "In 2118, Jim Vale enters the connection cabin for his second digital correction. This time, something does not follow the program."] },
@@ -248,7 +248,7 @@ const graphTypes = {
 };
 
 const graphNodes = [
-  ["b1", "book", "月球暗面", "Darkside of the Moon", "档案 I · 第一扇门。系列入口。", "Archive I · The First Gate. The entrance to the series."],
+  ["b1", "book", "月球暗面", "Darkside of the Moon", "档案 I · 挣脱通往真相的第一道枷锁。系列入口。", "Archive I · The First Gate. The entrance to the series."],
   ["b2", "book", "巨鲸陨落", "Whale Fall", "档案 II · 法厄同证词。查理在远古战争中的见证。", "Archive II · Phaethon Testimony. Charlie's witness of the ancient war."],
   ["jim", "character", "吉姆·维尔", "Jim Vale", "第一扇门的打开者。", "Opener of the first door."],
   ["djim", "character", "数字吉姆", "Digital Jim", "吉姆的数字双生体，主体核问题的入口。", "Jim's digital twin, entrance to the Subject Core problem."],
