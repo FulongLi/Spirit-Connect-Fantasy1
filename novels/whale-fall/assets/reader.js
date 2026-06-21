@@ -154,7 +154,6 @@
 
     const number = document.getElementById("track-number");
     const title = document.getElementById("track-title");
-    const bar = document.getElementById("track-bar");
     const playBtn = document.getElementById("track-play");
     const toggle = document.getElementById("track-toggle");
     const list = document.getElementById("track-list");
@@ -175,7 +174,6 @@
       stIndex = index;
       number.textContent = track.number;
       title.textContent = track.title[stLang];
-      if (bar) bar.style.width = "0%";
       audio.removeAttribute("src");
       playBtn.disabled = !track.src;
       if (track.src) {
@@ -231,9 +229,6 @@
 
     audio.addEventListener("play", setPlayIcon);
     audio.addEventListener("pause", setPlayIcon);
-    audio.addEventListener("timeupdate", function () {
-      if (bar && audio.duration) bar.style.width = (audio.currentTime / audio.duration) * 100 + "%";
-    });
     audio.addEventListener("ended", function () {
       load((stIndex + 1) % tracks.length, true);
     });

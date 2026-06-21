@@ -596,43 +596,50 @@ th {
   max-width: 480px;
 }
 
-/* Slim bar: song name on the left, play/pause on the right */
+/* Pill-shaped slim bar: number + name on the left, play & playlist icons on the right */
 .sp-bar {
-  position: relative;
   display: flex;
   align-items: center;
-  gap: 14px;
-  overflow: hidden;
-  padding: 12px 14px;
+  gap: 12px;
+  padding: 8px 10px;
   border: 1px solid rgba(128, 206, 255, 0.2);
-  border-radius: 10px;
+  border-radius: 999px;
   background:
-    linear-gradient(135deg, rgba(94, 220, 255, 0.1), transparent 52%),
-    rgba(9, 20, 33, 0.66);
+    linear-gradient(135deg, rgba(94, 220, 255, 0.12), transparent 55%),
+    rgba(9, 20, 33, 0.7);
 }
 
 body[data-theme="day"] .sp-bar {
   background:
-    linear-gradient(135deg, rgba(43, 142, 204, 0.12), transparent 52%),
-    rgba(255, 255, 255, 0.7);
+    linear-gradient(135deg, rgba(43, 142, 204, 0.14), transparent 55%),
+    rgba(255, 255, 255, 0.72);
 }
 
-.sp-name {
-  display: flex;
-  flex: 1;
-  min-width: 0;
-  align-items: baseline;
-  gap: 10px;
-}
-
-.sp-name b {
+.sp-num {
+  display: grid;
   flex: none;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
   color: var(--amber);
-  font-size: 13px;
+  background: rgba(3, 6, 11, 0.5);
+  font-size: 14px;
   font-weight: 950;
 }
 
+body[data-theme="day"] .sp-num {
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.sp-name {
+  flex: 1;
+  min-width: 0;
+}
+
 .sp-name span {
+  display: block;
   overflow: hidden;
   color: var(--ink);
   font-size: clamp(15px, 1.8vw, 18px);
@@ -641,23 +648,39 @@ body[data-theme="day"] .sp-bar {
   white-space: nowrap;
 }
 
-.sp-play {
+.sp-icon {
   display: grid;
   flex: none;
   place-items: center;
   width: 42px;
   height: 42px;
-  border: none;
+  border: 1px solid var(--line-strong);
   border-radius: 50%;
+  color: var(--ink);
+  background: rgba(9, 20, 33, 0.4);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+body[data-theme="day"] .sp-icon {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.sp-icon:hover {
+  transform: scale(1.05);
+}
+
+.sp-icon svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.sp-play {
+  border: none;
   color: #061523;
   background: linear-gradient(180deg, rgba(129, 232, 255, 0.98), rgba(43, 184, 255, 0.82));
   box-shadow: 0 0 22px rgba(43, 184, 255, 0.26);
-  cursor: pointer;
-  transition: transform 0.15s ease;
-}
-
-.sp-play:hover {
-  transform: scale(1.05);
 }
 
 .sp-play:disabled {
@@ -666,61 +689,13 @@ body[data-theme="day"] .sp-bar {
   transform: none;
 }
 
-.sp-play svg {
-  display: block;
-  width: 20px;
-  height: 20px;
+.soundtrack-player.is-open .sp-listbtn {
+  color: var(--cyan);
+  border-color: var(--cyan);
+  background: rgba(94, 220, 255, 0.16);
 }
 
-.sp-bar-progress {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 3px;
-  background: rgba(128, 206, 255, 0.16);
-}
-
-.sp-bar-progress span {
-  display: block;
-  width: 0;
-  height: 100%;
-  background: linear-gradient(90deg, var(--cyan), var(--violet));
-}
-
-/* Playlist toggle bar */
-.sp-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 8px;
-  padding: 10px 14px;
-  border: 1px solid rgba(128, 206, 255, 0.14);
-  border-radius: 10px;
-  color: var(--soft-ink);
-  background: rgba(9, 20, 33, 0.42);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-body[data-theme="day"] .sp-toggle {
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.sp-chevron {
-  width: 16px;
-  height: 16px;
-  transition: transform 0.25s ease;
-}
-
-.soundtrack-player.is-open .sp-chevron {
-  transform: rotate(180deg);
-}
-
-/* Collapsible track list */
+/* Collapsible track list (rounded) */
 .sp-list {
   display: grid;
   gap: 8px;
@@ -734,7 +709,7 @@ body[data-theme="day"] .sp-toggle {
 
 .soundtrack-player.is-open .sp-list {
   max-height: 300px;
-  margin-top: 8px;
+  margin-top: 10px;
   overflow-y: auto;
 }
 
@@ -745,8 +720,8 @@ body[data-theme="day"] .sp-toggle {
   align-items: center;
   gap: 12px;
   border: 1px solid rgba(128, 206, 255, 0.1);
-  border-radius: 8px;
-  padding: 10px 14px;
+  border-radius: 999px;
+  padding: 10px 18px;
   color: var(--ink);
   background: rgba(3, 6, 11, 0.24);
   text-align: left;

@@ -35,19 +35,15 @@
             </div>
             <div class="soundtrack-player" data-soundtrack-player>
               <div class="sp-bar">
-                <div class="sp-name">
-                  <b id="track-number">01</b>
-                  <span id="track-title">废墟之上的阴影</span>
-                </div>
-                <button type="button" id="track-play" class="sp-play" aria-label="播放 / Play">
+                <span class="sp-num" id="track-number">01</span>
+                <div class="sp-name"><span id="track-title">废墟之上的阴影</span></div>
+                <button type="button" id="track-play" class="sp-icon sp-play" aria-label="播放 / Play">
                   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l13 7-13 7z"/></svg>
                 </button>
-                <span class="sp-bar-progress"><span id="track-bar"></span></span>
+                <button type="button" id="track-toggle" class="sp-icon sp-listbtn" aria-label="播放列表 / Playlist" aria-expanded="false">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="6" width="12" height="2" rx="1"/><rect x="3" y="11" width="12" height="2" rx="1"/><rect x="3" y="16" width="8" height="2" rx="1"/><path d="M16 10.5l6 3.5-6 3.5z"/></svg>
+                </button>
               </div>
-              <button type="button" id="track-toggle" class="sp-toggle" aria-expanded="false">
-                <span data-i18n="playlist">播放列表</span>
-                <svg class="sp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-              </button>
               <ol class="sp-list" id="track-list"></ol>
               <audio id="soundtrack-audio" preload="metadata"></audio>
             </div>
