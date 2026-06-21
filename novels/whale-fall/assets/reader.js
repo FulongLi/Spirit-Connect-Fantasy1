@@ -138,76 +138,112 @@
     });
   }
 
+  const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l13 7-13 7z"/></svg>';
+  const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
+  let stIndex = 0;
+  let stLoop = false;
+  let stLang = currentLang;
+
   function setupSoundtrack(lang) {
+    stLang = lang;
     const tracks = window.whaleFallSoundtrack || [];
-    const list = document.getElementById("track-list");
+    const player = document.querySelector("[data-soundtrack-player]");
     const audio = document.getElementById("soundtrack-audio");
-    const play = document.getElementById("track-play");
+    if (!player || !audio || !tracks.length) return;
+
     const number = document.getElementById("track-number");
     const title = document.getElementById("track-title");
-    const mood = document.getElementById("track-mood");
-    const duration = document.getElementById("track-duration");
-    if (!list || !audio || !play || !tracks.length) return;
+    const cur = document.getElementById("track-current");
+    const dur = document.getElementById("track-duration");
+    const bar = document.getElementById("track-bar");
+    const progress = document.getElementById("track-progress");
+    const playBtn = document.getElementById("track-play");
+    const prevBtn = document.getElementById("track-prev");
+    const nextBtn = document.getElementById("track-next");
+    const loopBtn = document.getElementById("track-loop");
 
-    let activeIndex = Number(list.dataset.activeIndex || 0);
-    let isPlaying = false;
+    function fmt(t) {
+      if (!isFinite(t) || t < 0) t = 0;
+      const m = Math.floor(t / 60);
+      const s = Math.floor(t % 60);
+      return m + ":" + String(s).padStart(2, "0");
+    }
 
-    function paintTrack(index) {
+    function setPlayIcon() {
+      playBtn.innerHTML = audio.paused ? ICON_PLAY : ICON_PAUSE;
+    }
+
+    function load(index, autoplay) {
       const track = tracks[index];
       if (!track) return;
-      activeIndex = index;
-      list.dataset.activeIndex = String(index);
+      stIndex = index;
       number.textContent = track.number;
-      title.textContent = track.title[lang];
-      if (mood) mood.textContent = track.mood[lang];
-      duration.textContent = track.duration;
-      play.disabled = !track.src;
-      play.textContent = track.src ? copy[lang].trackPlay : copy[lang].trackPending;
+      title.textContent = track.title[stLang];
+      dur.textContent = track.duration;
+      cur.textContent = "0:00";
+      bar.style.width = "0%";
       audio.removeAttribute("src");
-      if (track.src) audio.src = "soundtrack/" + track.src;
-      list.querySelectorAll("button").forEach((button) => {
-        button.classList.toggle("is-active", Number(button.dataset.trackIndex) === index);
-      });
-      isPlaying = false;
+      playBtn.disabled = !track.src;
+      if (track.src) {
+        audio.src = "soundtrack/" + track.src;
+        if (autoplay) audio.play().catch(function () {});
+      }
+      setPlayIcon();
     }
 
-    function renderList() {
-      list.innerHTML = tracks
-        .map((track, index) => `
-          <li>
-            <button type="button" data-track-index="${index}">
-              <span>${track.number}</span>
-              <strong>${track.title[lang]}</strong>
-              <small>${track.duration}</small>
-            </button>
-          </li>
-        `)
-        .join("");
-      list.querySelectorAll("button").forEach((button) => {
-        button.addEventListener("click", () => paintTrack(Number(button.dataset.trackIndex)));
-      });
-      paintTrack(activeIndex);
+    // Re-running on language switch: only refresh the visible title, keep playback.
+    if (player.dataset.bound) {
+      const t = tracks[stIndex];
+      if (t) title.textContent = t.title[stLang];
+      return;
     }
+    player.dataset.bound = "1";
 
-    play.onclick = async () => {
-      if (!audio.src) return;
-      if (isPlaying) {
-        audio.pause();
-        play.textContent = copy[lang].trackPlay;
-        isPlaying = false;
+    playBtn.onclick = function () {
+      if (!audio.src) {
+        load(stIndex, true);
         return;
       }
-      await audio.play();
-      play.textContent = copy[lang].trackPause;
-      isPlaying = true;
+      if (audio.paused) audio.play().catch(function () {});
+      else audio.pause();
     };
 
-    audio.onended = () => {
-      play.textContent = copy[lang].trackPlay;
-      isPlaying = false;
+    prevBtn.onclick = function () {
+      load((stIndex - 1 + tracks.length) % tracks.length, !audio.paused);
     };
 
-    renderList();
+    nextBtn.onclick = function () {
+      load((stIndex + 1) % tracks.length, !audio.paused);
+    };
+
+    loopBtn.onclick = function () {
+      stLoop = !stLoop;
+      audio.loop = stLoop;
+      loopBtn.classList.toggle("is-active", stLoop);
+    };
+
+    audio.addEventListener("play", setPlayIcon);
+    audio.addEventListener("pause", setPlayIcon);
+    audio.addEventListener("loadedmetadata", function () {
+      if (audio.duration) dur.textContent = fmt(audio.duration);
+    });
+    audio.addEventListener("timeupdate", function () {
+      cur.textContent = fmt(audio.currentTime);
+      if (audio.duration) bar.style.width = (audio.currentTime / audio.duration) * 100 + "%";
+    });
+    audio.addEventListener("ended", function () {
+      // When loop is on, audio.loop repeats this track automatically.
+      if (!stLoop) load((stIndex + 1) % tracks.length, true);
+    });
+    progress.addEventListener("click", function (e) {
+      if (!audio.duration) return;
+      const rect = progress.getBoundingClientRect();
+      const ratio = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = Math.max(0, Math.min(1, ratio)) * audio.duration;
+    });
+
+    loopBtn.classList.toggle("is-active", stLoop);
+    load(stIndex, false);
   }
 
   document.body.dataset.lang = currentLang;
