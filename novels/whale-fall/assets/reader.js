@@ -159,7 +159,7 @@
       list.dataset.activeIndex = String(index);
       number.textContent = track.number;
       title.textContent = track.title[lang];
-      mood.textContent = track.mood[lang];
+      if (mood) mood.textContent = track.mood[lang];
       duration.textContent = track.duration;
       play.disabled = !track.src;
       play.textContent = track.src ? copy[lang].trackPlay : copy[lang].trackPending;
@@ -178,7 +178,7 @@
             <button type="button" data-track-index="${index}">
               <span>${track.number}</span>
               <strong>${track.title[lang]}</strong>
-              <small>${copy[lang].trackChapter} ${track.chapter} · ${track.duration}</small>
+              <small>${track.duration}</small>
             </button>
           </li>
         `)
