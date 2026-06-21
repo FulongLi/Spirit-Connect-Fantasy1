@@ -23,6 +23,7 @@
       trackPlay: "播放",
       trackPause: "暂停",
       trackChapter: "章节",
+      playlist: "播放列表",
     },
     en: {
       brand: "SPIRIT CONNECT FANTASY",
@@ -46,6 +47,7 @@
       trackPlay: "Play",
       trackPause: "Pause",
       trackChapter: "Chapter",
+      playlist: "Playlist",
     },
   };
 
@@ -141,7 +143,6 @@
   const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l13 7-13 7z"/></svg>';
   const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
   let stIndex = 0;
-  let stLoop = false;
   let stLang = currentLang;
 
   function setupSoundtrack(lang) {
@@ -153,24 +154,19 @@
 
     const number = document.getElementById("track-number");
     const title = document.getElementById("track-title");
-    const cur = document.getElementById("track-current");
-    const dur = document.getElementById("track-duration");
     const bar = document.getElementById("track-bar");
-    const progress = document.getElementById("track-progress");
     const playBtn = document.getElementById("track-play");
-    const prevBtn = document.getElementById("track-prev");
-    const nextBtn = document.getElementById("track-next");
-    const loopBtn = document.getElementById("track-loop");
-
-    function fmt(t) {
-      if (!isFinite(t) || t < 0) t = 0;
-      const m = Math.floor(t / 60);
-      const s = Math.floor(t % 60);
-      return m + ":" + String(s).padStart(2, "0");
-    }
+    const toggle = document.getElementById("track-toggle");
+    const list = document.getElementById("track-list");
 
     function setPlayIcon() {
       playBtn.innerHTML = audio.paused ? ICON_PLAY : ICON_PAUSE;
+    }
+
+    function highlight() {
+      list.querySelectorAll("button").forEach(function (b) {
+        b.classList.toggle("is-active", Number(b.dataset.i) === stIndex);
+      });
     }
 
     function load(index, autoplay) {
@@ -179,9 +175,7 @@
       stIndex = index;
       number.textContent = track.number;
       title.textContent = track.title[stLang];
-      dur.textContent = track.duration;
-      cur.textContent = "0:00";
-      bar.style.width = "0%";
+      if (bar) bar.style.width = "0%";
       audio.removeAttribute("src");
       playBtn.disabled = !track.src;
       if (track.src) {
@@ -189,12 +183,34 @@
         if (autoplay) audio.play().catch(function () {});
       }
       setPlayIcon();
+      highlight();
     }
 
-    // Re-running on language switch: only refresh the visible title, keep playback.
+    function renderList() {
+      list.innerHTML = tracks
+        .map(function (t, i) {
+          return (
+            '<li><button type="button" data-i="' + i + '">' +
+            "<span>" + t.number + "</span>" +
+            "<strong>" + t.title[stLang] + "</strong>" +
+            "<small>" + t.duration + "</small>" +
+            "</button></li>"
+          );
+        })
+        .join("");
+      list.querySelectorAll("button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          load(Number(b.dataset.i), true);
+        });
+      });
+      highlight();
+    }
+
+    // Re-running on language switch: refresh texts, keep playback & open state.
     if (player.dataset.bound) {
       const t = tracks[stIndex];
       if (t) title.textContent = t.title[stLang];
+      renderList();
       return;
     }
     player.dataset.bound = "1";
@@ -208,41 +224,21 @@
       else audio.pause();
     };
 
-    prevBtn.onclick = function () {
-      load((stIndex - 1 + tracks.length) % tracks.length, !audio.paused);
-    };
-
-    nextBtn.onclick = function () {
-      load((stIndex + 1) % tracks.length, !audio.paused);
-    };
-
-    loopBtn.onclick = function () {
-      stLoop = !stLoop;
-      audio.loop = stLoop;
-      loopBtn.classList.toggle("is-active", stLoop);
+    toggle.onclick = function () {
+      const open = player.classList.toggle("is-open");
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
     };
 
     audio.addEventListener("play", setPlayIcon);
     audio.addEventListener("pause", setPlayIcon);
-    audio.addEventListener("loadedmetadata", function () {
-      if (audio.duration) dur.textContent = fmt(audio.duration);
-    });
     audio.addEventListener("timeupdate", function () {
-      cur.textContent = fmt(audio.currentTime);
-      if (audio.duration) bar.style.width = (audio.currentTime / audio.duration) * 100 + "%";
+      if (bar && audio.duration) bar.style.width = (audio.currentTime / audio.duration) * 100 + "%";
     });
     audio.addEventListener("ended", function () {
-      // When loop is on, audio.loop repeats this track automatically.
-      if (!stLoop) load((stIndex + 1) % tracks.length, true);
-    });
-    progress.addEventListener("click", function (e) {
-      if (!audio.duration) return;
-      const rect = progress.getBoundingClientRect();
-      const ratio = (e.clientX - rect.left) / rect.width;
-      audio.currentTime = Math.max(0, Math.min(1, ratio)) * audio.duration;
+      load((stIndex + 1) % tracks.length, true);
     });
 
-    loopBtn.classList.toggle("is-active", stLoop);
+    renderList();
     load(stIndex, false);
   }
 

@@ -34,29 +34,21 @@
               <h2 id="soundtrack-title" data-i18n="soundtrackTitle">巨鲸陨落 Soundtrack</h2>
             </div>
             <div class="soundtrack-player" data-soundtrack-player>
-              <div class="sp-now">
-                <span id="track-number">01</span>
-                <h3 id="track-title">废墟之上的阴影</h3>
-              </div>
-              <div class="sp-progress" id="track-progress"><span id="track-bar"></span></div>
-              <div class="sp-times">
-                <time id="track-current">0:00</time>
-                <time id="track-duration">3:29</time>
-              </div>
-              <div class="sp-controls">
-                <button type="button" id="track-prev" class="sp-btn" aria-label="上一曲 / Previous">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 6h2v12H7zM20 6v12l-9-6z"/></svg>
-                </button>
-                <button type="button" id="track-play" class="sp-btn sp-btn-main" aria-label="播放 / Play">
+              <div class="sp-bar">
+                <div class="sp-name">
+                  <b id="track-number">01</b>
+                  <span id="track-title">废墟之上的阴影</span>
+                </div>
+                <button type="button" id="track-play" class="sp-play" aria-label="播放 / Play">
                   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l13 7-13 7z"/></svg>
                 </button>
-                <button type="button" id="track-next" class="sp-btn" aria-label="下一曲 / Next">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 6h2v12h-2zM4 6l9 6-9 6z"/></svg>
-                </button>
-                <button type="button" id="track-loop" class="sp-btn" aria-label="循环 / Loop">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-                </button>
+                <span class="sp-bar-progress"><span id="track-bar"></span></span>
               </div>
+              <button type="button" id="track-toggle" class="sp-toggle" aria-expanded="false">
+                <span data-i18n="playlist">播放列表</span>
+                <svg class="sp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <ol class="sp-list" id="track-list"></ol>
               <audio id="soundtrack-audio" preload="metadata"></audio>
             </div>
           </section>
