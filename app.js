@@ -26,14 +26,14 @@ const books = [
     glyph: { zh: "鲸", en: "WF" },
     title: { zh: "巨鲸陨落", en: "Whale Fall" },
     kicker: { zh: "档案 II · 法厄同证词", en: "Archive II · Phaethon Testimony" },
-    status: { zh: "筹备中", en: "In Development" },
+    status: { zh: "阅读稿已接入", en: "Reading Draft Added" },
     theme: { zh: "文明遗产 · 鲸歌回声", en: "Civilization Relic · Whale Echo" },
     accent: "#4da3ff",
     cover: { zh: "assets/WF_cn.png", en: "assets/WF_en.png" },
     link: "novels/whale-fall/",
     description: {
-      zh: "遍览古代文明，人类像猴子一样几千年没有成长。阿卡西的海洋像雨水一样浇灌在每一位智人的头顶，没有高一级的文明介入，就算淹死，猴子依然是猴子。",
-      en: "Across the sweep of ancient civilizations, humanity has remained like apes, unchanged for thousands of years. The ocean of Akasha falls like rain upon every Homo sapiens, yet without the intervention of a higher civilization, even if drowned, an ape remains an ape.",
+      zh: "查理在一具陌生身体里醒来，脚下是尸山，天空中有一头巨鲸正在坠落。远古战争的尾声，将把地球生命、五族遗产与鲸歌回声重新连在一起。",
+      en: "Charlie wakes inside a stranger's body, standing on a mountain of the dead as a giant whale falls through the sky. The end of an ancient war reconnects Earth's life, the legacy of five peoples, and the echo of whale song.",
     },
   },
   {
@@ -208,7 +208,7 @@ const storyBooks = [
     accent: "#7c4dff",
     title: { zh: "巨鲸陨落", en: "Whale Fall" },
     subtitle: { zh: "档案 II · 法厄同证词", en: "Archive II · Phaethon Testimony" },
-    status: { zh: "筹备中", en: "In Development" },
+    status: { zh: "阅读稿已接入", en: "Reading Draft Added" },
     nodes: [
       { zh: ["尸山之上", "查理在一具陌生的身体里醒来，站在尸体堆成的山上。"], en: ["Mountain of the Dead", "Charlie wakes in a stranger's body, standing on a mountain of corpses."] },
       { zh: ["巨鲸从天而降", "天空开始震动。一头燃烧的巨鲸自高空坠落，像星舰，也像文明的记忆。"], en: ["The Whale Falls", "The sky shudders. A burning whale descends like a starship and a civilization's memory."] },
