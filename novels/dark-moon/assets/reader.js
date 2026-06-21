@@ -23,6 +23,7 @@
       trackPlay: "播放",
       trackPause: "暂停",
       trackChapter: "章节",
+      playlist: "播放列表",
       supportFooter: `如果你喜欢本系列，欢迎在 Apple Books 支持我：<a href="${supportUrl}">Darkside of the Moon</a>。感谢你的阅读与支持。`,
     },
     en: {
@@ -47,6 +48,7 @@
       trackPlay: "Play",
       trackPause: "Pause",
       trackChapter: "Chapter",
+      playlist: "Playlist",
       supportFooter: `If you enjoy this series, you can support me on Apple Books: <a href="${supportUrl}">Darkside of the Moon</a>. Thank you for reading and supporting the work.`,
     },
   };
@@ -151,76 +153,114 @@
     main.append(footer);
   }
 
+  const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l13 7-13 7z"/></svg>';
+  const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
+  let stIndex = 0;
+  let stLang = currentLang;
+
   function setupSoundtrack(lang) {
+    stLang = lang;
     const tracks = window.darkMoonSoundtrack || [];
-    const list = document.getElementById("track-list");
+    const player = document.querySelector("[data-soundtrack-player]");
     const audio = document.getElementById("soundtrack-audio");
-    const play = document.getElementById("track-play");
+    if (!player || !audio || !tracks.length) return;
+
     const number = document.getElementById("track-number");
     const title = document.getElementById("track-title");
-    const mood = document.getElementById("track-mood");
-    const duration = document.getElementById("track-duration");
-    if (!list || !audio || !play || !tracks.length) return;
+    const playBtn = document.getElementById("track-play");
+    const toggle = document.getElementById("track-toggle");
+    const list = document.getElementById("track-list");
+    const ring = document.getElementById("track-ring");
+    const RING_C = 2 * Math.PI * 20;
 
-    let activeIndex = Number(list.dataset.activeIndex || 0);
-    let isPlaying = false;
+    function setPlayIcon() {
+      playBtn.innerHTML = audio.paused ? ICON_PLAY : ICON_PAUSE;
+    }
 
-    function paintTrack(index) {
+    function setRing(frac) {
+      if (!ring) return;
+      ring.style.strokeDasharray = RING_C;
+      ring.style.strokeDashoffset = RING_C * (1 - Math.max(0, Math.min(1, frac || 0)));
+    }
+
+    function highlight() {
+      list.querySelectorAll("button").forEach(function (b) {
+        b.classList.toggle("is-active", Number(b.dataset.i) === stIndex);
+      });
+    }
+
+    function load(index, autoplay) {
       const track = tracks[index];
       if (!track) return;
-      activeIndex = index;
-      list.dataset.activeIndex = String(index);
+      stIndex = index;
       number.textContent = track.number;
-      title.textContent = track.title[lang];
-      mood.textContent = track.mood[lang];
-      duration.textContent = track.duration;
-      play.disabled = !track.src;
-      play.textContent = track.src ? copy[lang].trackPlay : copy[lang].trackPending;
+      title.textContent = track.title[stLang];
+      setRing(0);
       audio.removeAttribute("src");
-      if (track.src) audio.src = "soundtrack/" + track.src;
-      list.querySelectorAll("button").forEach((button) => {
-        button.classList.toggle("is-active", Number(button.dataset.trackIndex) === index);
-      });
-      isPlaying = false;
+      playBtn.disabled = !track.src;
+      if (track.src) {
+        audio.src = "soundtrack/" + track.src;
+        if (autoplay) audio.play().catch(function () {});
+      }
+      setPlayIcon();
+      highlight();
     }
 
     function renderList() {
       list.innerHTML = tracks
-        .map((track, index) => `
-          <li>
-            <button type="button" data-track-index="${index}">
-              <span>${track.number}</span>
-              <strong>${track.title[lang]}</strong>
-              <small>${copy[lang].trackChapter} ${track.chapter} · ${track.duration}</small>
-            </button>
-          </li>
-        `)
+        .map(function (t, i) {
+          return (
+            '<li><button type="button" data-i="' + i + '">' +
+            "<span>" + t.number + "</span>" +
+            "<strong>" + t.title[stLang] + "</strong>" +
+            "<small>" + t.duration + "</small>" +
+            "</button></li>"
+          );
+        })
         .join("");
-      list.querySelectorAll("button").forEach((button) => {
-        button.addEventListener("click", () => paintTrack(Number(button.dataset.trackIndex)));
+      list.querySelectorAll("button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          load(Number(b.dataset.i), true);
+        });
       });
-      paintTrack(activeIndex);
+      highlight();
     }
 
-    play.onclick = async () => {
-      if (!audio.src) return;
-      if (isPlaying) {
-        audio.pause();
-        play.textContent = copy[lang].trackPlay;
-        isPlaying = false;
+    // Re-running on language switch: refresh texts, keep playback & open state.
+    if (player.dataset.bound) {
+      const t = tracks[stIndex];
+      if (t) title.textContent = t.title[stLang];
+      renderList();
+      return;
+    }
+    player.dataset.bound = "1";
+
+    playBtn.onclick = function () {
+      if (!audio.src) {
+        load(stIndex, true);
         return;
       }
-      await audio.play();
-      play.textContent = copy[lang].trackPause;
-      isPlaying = true;
+      if (audio.paused) audio.play().catch(function () {});
+      else audio.pause();
     };
 
-    audio.onended = () => {
-      play.textContent = copy[lang].trackPlay;
-      isPlaying = false;
+    toggle.onclick = function () {
+      const open = player.classList.toggle("is-open");
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
     };
+
+    audio.addEventListener("play", setPlayIcon);
+    audio.addEventListener("pause", setPlayIcon);
+    audio.addEventListener("timeupdate", function () {
+      if (audio.duration) setRing(audio.currentTime / audio.duration);
+    });
+    audio.addEventListener("ended", function () {
+      setRing(1);
+      load((stIndex + 1) % tracks.length, true);
+    });
 
     renderList();
+    load(stIndex, false);
   }
 
   document.body.dataset.lang = currentLang;

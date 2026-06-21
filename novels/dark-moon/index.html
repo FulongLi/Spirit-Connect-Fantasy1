@@ -27,6 +27,33 @@
           <div class="hero-actions">
             <a id="start-reading" href="zh_html/00_书名页与写作说明.html" data-i18n="start">开始阅读</a>
           </div>
+
+          <section class="soundtrack-panel" aria-labelledby="soundtrack-title">
+            <div class="soundtrack-heading">
+              <p class="eyebrow" data-i18n="soundtrackKicker">原声概念</p>
+              <h2 id="soundtrack-title" data-i18n="soundtrackTitle">月球暗面 Soundtrack</h2>
+            </div>
+            <div class="soundtrack-player" data-soundtrack-player>
+              <div class="sp-bar">
+                <span class="sp-num" id="track-number">01</span>
+                <div class="sp-name"><span id="track-title">黑水与苏醒</span></div>
+                <span class="sp-playwrap">
+                  <svg class="sp-ring" viewBox="0 0 44 44" aria-hidden="true">
+                    <circle class="sp-ring-track" cx="22" cy="22" r="20"></circle>
+                    <circle class="sp-ring-fill" id="track-ring" cx="22" cy="22" r="20"></circle>
+                  </svg>
+                  <button type="button" id="track-play" class="sp-icon sp-play" aria-label="播放 / Play">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l13 7-13 7z"/></svg>
+                  </button>
+                </span>
+                <button type="button" id="track-toggle" class="sp-icon sp-listbtn" aria-label="播放列表 / Playlist" aria-expanded="false">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="6" width="16" height="2.4" rx="1.2"/><rect x="4" y="10.8" width="16" height="2.4" rx="1.2"/><rect x="4" y="15.6" width="16" height="2.4" rx="1.2"/></svg>
+                </button>
+              </div>
+              <ol class="sp-list" id="track-list"></ol>
+              <audio id="soundtrack-audio" preload="metadata"></audio>
+            </div>
+          </section>
         </div>
         <figure class="cover-stack" aria-label="Darkside of the Moon covers">
           <img class="cover-zh" src="../../assets/DM_cn.png" alt="月球暗面中文封面" />
@@ -79,32 +106,6 @@
         <li><span>34</span><a href="zh_html/34_泰拉撒第一层门.html">泰拉撒第一层门</a><a href="en_html/34_泰拉撒第一层门.html">The First Gate of Terasha</a></li>
         <li><span>35</span><a href="zh_html/35_下一本入口.html">下一本入口</a><a href="en_html/35_下一本入口.html">The Door to the Next Book</a></li>
       </ol>
-
-      <section class="soundtrack-panel" aria-labelledby="soundtrack-title">
-        <div class="soundtrack-heading">
-          <p class="eyebrow" data-i18n="soundtrackKicker">原声概念</p>
-          <h2 id="soundtrack-title" data-i18n="soundtrackTitle">月球暗面 Soundtrack</h2>
-          <p data-i18n="soundtrackLead">
-            这里预留给本书的音乐列表。每首歌可以对应章节、场景或概念；音频上传后即可在页面里播放。
-          </p>
-        </div>
-        <div class="soundtrack-player" data-soundtrack-player>
-          <div class="track-now">
-            <span id="track-number">01</span>
-            <div>
-              <h3 id="track-title">黑水与苏醒</h3>
-              <p id="track-mood">低频脉冲 · 失重 · 第一次意识剥离</p>
-            </div>
-          </div>
-          <div class="player-controls">
-            <button type="button" id="track-play" disabled data-i18n="trackPending">音频待上传</button>
-            <div class="track-progress" aria-hidden="true"><span></span></div>
-            <time id="track-duration">3:42</time>
-          </div>
-          <audio id="soundtrack-audio" preload="metadata"></audio>
-          <ol class="track-list" id="track-list"></ol>
-        </div>
-      </section>
     </main>
     <script src="soundtrack/catalog.js"></script>
     <script src="assets/reader.js"></script>
