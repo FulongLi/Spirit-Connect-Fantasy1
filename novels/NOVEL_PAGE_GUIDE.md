@@ -60,7 +60,7 @@ body[data-lang="zh"] .cover-stack .cover-en,
 body[data-lang="en"] .cover-stack .cover-zh { /* 后:top:92px; right:0; z-index:1; 变暗 */ }
 ```
 
-移动端(`max-width:760px`)有对应的 left/right 调整,一并复制。
+移动端(`max-width:760px`)需要重新排两张封面的位置与容器高度,避免后封面溢出压到下方文字,详见第 8 节。
 
 ---
 
@@ -178,3 +178,37 @@ window.<camelCaseSlug>Soundtrack = [
 7. 自检:`node --check assets/reader.js`;首页中英切换、封面切换、音乐播放/列表展开均正常;章节页仅底部导航。
 
 > 说明:四本占位小说(mystic-cat、crimson-cruise、spacetime-labyrinth、where-souls-return)目前仍是「创作中」单页,正式制作时按本规则套用即可;它们的中英封面图已在 `assets/` 备好。
+
+---
+
+## 8. 移动端(响应式,`@media (max-width: 760px)`)
+
+新书复制模板即可继承这些规则,无需重写。
+
+### 8.1 章节底部导航(上一章 / 目录 / 下一章)
+
+- **保持一行三个**:上一章(左)· 目录(中)· 下一章(右),沿用桌面的 `grid-template-columns: 1fr auto 1fr`。**不要**在手机端压成单列(会出现按钮错位的"阶梯"状)。
+- 手机端只收紧间距与字号即可:
+
+  ```css
+  .chapter-nav, .nav { gap: 8px; margin-top: 40px; padding-top: 18px; }
+  .chapter-nav a, .nav a { padding: 0 14px; font-size: 12px; }
+  ```
+
+### 8.2 封面叠放(cover-stack)
+
+- 封面图比例约 **高:宽 = 1.6**。两张图绝对定位叠放,手机端容器高度必须能容下"靠后那张"的偏移,否则它会溢出压到下方文字。
+- 用一个随宽度缩放的变量统一控制,避免固定 `min-height` 在不同屏宽下溢出或留大空隙:
+
+  ```css
+  .cover-stack {
+    --cw: min(210px, 52vw);          /* 封面宽度 */
+    min-height: calc(var(--cw) * 1.94);  /* 容纳后封面:0.34 偏移 + 1.6 高度 */
+    margin-bottom: 6px;
+    order: -1;                       /* 手机端封面排到文字上方 */
+  }
+  .cover-stack img { width: var(--cw); }
+  /* 前(当前语言):top:0; left:6% */
+  /* 后(另一语言):top: calc(var(--cw) * 0.34); right:6% */
+  ```
+- 前/后由 `body[data-lang]` 决定(见第 3 节),手机端只改 `top` / `left` / `right` 偏移,层级与变暗规则不变。
