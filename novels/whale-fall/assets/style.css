@@ -8,10 +8,10 @@
   --panel: rgba(9, 20, 33, 0.82);
   --line: rgba(128, 206, 255, 0.2);
   --line-strong: rgba(94, 220, 255, 0.46);
-  --cyan: #64e6ff;
-  --blue: #2a9bff;
-  --violet: #7c6dff;
-  --amber: #8fe0d1;
+  --cyan: #5edcff;
+  --blue: #2bb8ff;
+  --violet: #9d7cff;
+  --amber: #e4bb6b;
   --shadow: rgba(0, 0, 0, 0.58);
 }
 
@@ -25,10 +25,10 @@ body[data-theme="day"] {
   --panel: rgba(247, 251, 255, 0.9);
   --line: rgba(48, 70, 95, 0.2);
   --line-strong: rgba(43, 142, 204, 0.42);
-  --cyan: #087596;
-  --blue: #1677c9;
-  --violet: #5650b2;
-  --amber: #287f77;
+  --cyan: #126ea8;
+  --blue: #1688cf;
+  --violet: #5f55b5;
+  --amber: #936923;
   --shadow: rgba(30, 54, 78, 0.2);
 }
 

@@ -53,7 +53,8 @@
 
   const isIndex = document.body.classList.contains("index-page");
   const path = window.location.pathname;
-  const currentLang = path.includes("/en_html/") ? "en" : path.includes("/zh_html/") ? "zh" : localStorage.getItem("darkMoonLang") || "zh";
+  const requestedLang = new URLSearchParams(window.location.search).get("lang") || localStorage.getItem("darkMoonLang") || localStorage.getItem("spiritConnectLang");
+  const currentLang = path.includes("/en_html/") ? "en" : path.includes("/zh_html/") ? "zh" : requestedLang === "en" || requestedLang === "zh" ? requestedLang : "zh";
   const currentTheme = localStorage.getItem("darkMoonTheme") || document.body.dataset.theme || "night";
 
   function setTheme(theme) {

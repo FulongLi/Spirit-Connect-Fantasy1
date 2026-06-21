@@ -528,7 +528,11 @@ const starField = buildParticles();
 const sparkleField = buildSparkles();
 const bookSprites = buildBookSprites();
 wireControls();
-applyLanguage("zh");
+const initialLanguage = (() => {
+  const requested = new URLSearchParams(window.location.search).get("lang") || localStorage.getItem("spiritConnectLang");
+  return requested === "en" || requested === "zh" ? requested : "zh";
+})();
+applyLanguage(initialLanguage);
 applyTheme("night");
 onResize();
 onScroll();
@@ -888,6 +892,7 @@ function wireControls() {
 
 function applyLanguage(next) {
   language = next;
+  localStorage.setItem("spiritConnectLang", language);
   const copy = uiText[language];
   document.title = copy.title;
   document.documentElement.lang = copy.htmlLang;
@@ -922,6 +927,10 @@ function applyLanguage(next) {
   setActiveBook(activeBook < 0 ? 0 : activeBook, true);
 }
 
+function bookLinkFor(linkTarget) {
+  return `${linkTarget}${linkTarget.includes("?") ? "&" : "?"}lang=${language}`;
+}
+
 function applyTheme(next) {
   mode = next;
   const t = themes[mode];
@@ -952,7 +961,7 @@ function buildArchive() {
       text: `${book.kicker[language] || book.kicker.zh}。${book.theme[language] || book.theme.zh}。${(book.description[language] || book.description.zh).slice(0, 86)}...`,
       empty: false,
       cover: getCover(book),
-      link: book.link,
+      link: bookLinkFor(book.link),
     })),
     ...reserved.map((name, i) => ({
       title: `${copy.reservedPrefix} ${String(i + books.length + 1).padStart(2, "0")}`,
@@ -1566,7 +1575,7 @@ function setActiveBook(index, force = false) {
   description.textContent = book.description[language] || book.description.zh;
   statusEl.textContent = book.status[language] || book.status.zh;
   themeEl.textContent = book.theme[language] || book.theme.zh;
-  link.href = book.link;
+  link.href = bookLinkFor(book.link);
   cover.style.setProperty("--cover-image", `url('${getCover(book)}')`);
   cover.style.borderColor = book.accent;
 }

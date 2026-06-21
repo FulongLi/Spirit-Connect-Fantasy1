@@ -1,4 +1,5 @@
 (function () {
+  const supportUrl = "https://books.apple.com/gb/book/darkside-of-the-moon/id6757206984";
   const copy = {
     zh: {
       brand: "灵接幻想",
@@ -11,9 +12,17 @@
       subtitle: "Whale Fall",
       intro:
         "尸山之上，查理在一具陌生身体里醒来。天空裂开，巨鲸从天而降；一场远古战争的尾声，开始反向照亮地球生命的来处。",
+      support: `如果你喜欢本系列，欢迎先在 Apple Books 支持已上线的《月球暗面》：<a href="${supportUrl}">Darkside of the Moon</a>`,
       start: "开始阅读",
       catalogKicker: "章节索引",
       catalogTitle: "中文阅读目录",
+      soundtrackKicker: "原声概念",
+      soundtrackTitle: "巨鲸陨落 Soundtrack",
+      soundtrackLead: "这里预留给本书的音乐列表。每首歌可以对应章节、场景或概念；音频上传后即可在页面里播放。",
+      trackPending: "音频待上传",
+      trackPlay: "播放",
+      trackPause: "暂停",
+      trackChapter: "章节",
     },
     en: {
       brand: "SPIRIT CONNECT FANTASY",
@@ -26,16 +35,25 @@
       subtitle: "巨鲸陨落",
       intro:
         "On a mountain of the dead, Charlie wakes inside a stranger's body. The sky splits, a giant whale falls, and the end of an ancient war begins to illuminate the origin of life on Earth.",
+      support: `If you enjoy this series, you can support the already published first book on Apple Books: <a href="${supportUrl}">Darkside of the Moon</a>.`,
       start: "Start reading",
       catalogKicker: "Chapter Index",
       catalogTitle: "English Reading Index",
+      soundtrackKicker: "Soundtrack Concepts",
+      soundtrackTitle: "Whale Fall Soundtrack",
+      soundtrackLead: "A reserved music list for this book. Each track can map to a chapter, scene, or concept; once audio files are uploaded, they can play here.",
+      trackPending: "Audio pending",
+      trackPlay: "Play",
+      trackPause: "Pause",
+      trackChapter: "Chapter",
     },
   };
 
   const storagePrefix = "whaleFall";
   const isIndex = document.body.classList.contains("index-page");
   const path = window.location.pathname;
-  const currentLang = path.includes("/en_html/") ? "en" : path.includes("/zh_html/") ? "zh" : localStorage.getItem(storagePrefix + "Lang") || "zh";
+  const requestedLang = new URLSearchParams(window.location.search).get("lang") || localStorage.getItem(storagePrefix + "Lang") || localStorage.getItem("spiritConnectLang");
+  const currentLang = path.includes("/en_html/") ? "en" : path.includes("/zh_html/") ? "zh" : requestedLang === "en" || requestedLang === "zh" ? requestedLang : "zh";
   const currentTheme = localStorage.getItem(storagePrefix + "Theme") || document.body.dataset.theme || "night";
 
   function setTheme(theme) {
@@ -76,12 +94,15 @@
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
     document.querySelectorAll("[data-i18n]").forEach((node) => {
       const value = copy[lang][node.dataset.i18n];
-      if (value) node.textContent = value;
+      if (!value) return;
+      if (node.dataset.i18n === "support") node.innerHTML = value;
+      else node.textContent = value;
     });
     const start = document.getElementById("start-reading");
     if (start) start.href = chapterTarget(lang);
     localStorage.setItem(storagePrefix + "Lang", lang);
     refreshTopbar(lang);
+    setupSoundtrack(lang);
   }
 
   function createTopbar() {
@@ -117,10 +138,83 @@
     });
   }
 
+  function setupSoundtrack(lang) {
+    const tracks = window.whaleFallSoundtrack || [];
+    const list = document.getElementById("track-list");
+    const audio = document.getElementById("soundtrack-audio");
+    const play = document.getElementById("track-play");
+    const number = document.getElementById("track-number");
+    const title = document.getElementById("track-title");
+    const mood = document.getElementById("track-mood");
+    const duration = document.getElementById("track-duration");
+    if (!list || !audio || !play || !tracks.length) return;
+
+    let activeIndex = Number(list.dataset.activeIndex || 0);
+    let isPlaying = false;
+
+    function paintTrack(index) {
+      const track = tracks[index];
+      if (!track) return;
+      activeIndex = index;
+      list.dataset.activeIndex = String(index);
+      number.textContent = track.number;
+      title.textContent = track.title[lang];
+      mood.textContent = track.mood[lang];
+      duration.textContent = track.duration;
+      play.disabled = !track.src;
+      play.textContent = track.src ? copy[lang].trackPlay : copy[lang].trackPending;
+      audio.removeAttribute("src");
+      if (track.src) audio.src = "soundtrack/" + track.src;
+      list.querySelectorAll("button").forEach((button) => {
+        button.classList.toggle("is-active", Number(button.dataset.trackIndex) === index);
+      });
+      isPlaying = false;
+    }
+
+    function renderList() {
+      list.innerHTML = tracks
+        .map((track, index) => `
+          <li>
+            <button type="button" data-track-index="${index}">
+              <span>${track.number}</span>
+              <strong>${track.title[lang]}</strong>
+              <small>${copy[lang].trackChapter} ${track.chapter} · ${track.duration}</small>
+            </button>
+          </li>
+        `)
+        .join("");
+      list.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => paintTrack(Number(button.dataset.trackIndex)));
+      });
+      paintTrack(activeIndex);
+    }
+
+    play.onclick = async () => {
+      if (!audio.src) return;
+      if (isPlaying) {
+        audio.pause();
+        play.textContent = copy[lang].trackPlay;
+        isPlaying = false;
+        return;
+      }
+      await audio.play();
+      play.textContent = copy[lang].trackPause;
+      isPlaying = true;
+    };
+
+    audio.onended = () => {
+      play.textContent = copy[lang].trackPlay;
+      isPlaying = false;
+    };
+
+    renderList();
+  }
+
   document.body.dataset.lang = currentLang;
   localStorage.setItem(storagePrefix + "Lang", currentLang);
   createTopbar();
   refreshTopbar(currentLang);
   setTheme(currentTheme);
   setIndexLanguage(currentLang);
+  setupSoundtrack(currentLang);
 })();
