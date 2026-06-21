@@ -157,9 +157,17 @@
     const playBtn = document.getElementById("track-play");
     const toggle = document.getElementById("track-toggle");
     const list = document.getElementById("track-list");
+    const ring = document.getElementById("track-ring");
+    const RING_C = 2 * Math.PI * 22;
 
     function setPlayIcon() {
       playBtn.innerHTML = audio.paused ? ICON_PLAY : ICON_PAUSE;
+    }
+
+    function setRing(frac) {
+      if (!ring) return;
+      ring.style.strokeDasharray = RING_C;
+      ring.style.strokeDashoffset = RING_C * (1 - Math.max(0, Math.min(1, frac || 0)));
     }
 
     function highlight() {
@@ -174,6 +182,7 @@
       stIndex = index;
       number.textContent = track.number;
       title.textContent = track.title[stLang];
+      setRing(0);
       audio.removeAttribute("src");
       playBtn.disabled = !track.src;
       if (track.src) {
@@ -229,7 +238,11 @@
 
     audio.addEventListener("play", setPlayIcon);
     audio.addEventListener("pause", setPlayIcon);
+    audio.addEventListener("timeupdate", function () {
+      if (audio.duration) setRing(audio.currentTime / audio.duration);
+    });
     audio.addEventListener("ended", function () {
+      setRing(1);
       load((stIndex + 1) % tracks.length, true);
     });
 

@@ -37,11 +37,17 @@
               <div class="sp-bar">
                 <span class="sp-num" id="track-number">01</span>
                 <div class="sp-name"><span id="track-title">废墟之上的阴影</span></div>
-                <button type="button" id="track-play" class="sp-icon sp-play" aria-label="播放 / Play">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l13 7-13 7z"/></svg>
-                </button>
+                <span class="sp-playwrap">
+                  <svg class="sp-ring" viewBox="0 0 48 48" aria-hidden="true">
+                    <circle class="sp-ring-track" cx="24" cy="24" r="22"></circle>
+                    <circle class="sp-ring-fill" id="track-ring" cx="24" cy="24" r="22"></circle>
+                  </svg>
+                  <button type="button" id="track-play" class="sp-icon sp-play" aria-label="播放 / Play">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l13 7-13 7z"/></svg>
+                  </button>
+                </span>
                 <button type="button" id="track-toggle" class="sp-icon sp-listbtn" aria-label="播放列表 / Playlist" aria-expanded="false">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="6" width="12" height="2" rx="1"/><rect x="3" y="11" width="12" height="2" rx="1"/><rect x="3" y="16" width="8" height="2" rx="1"/><path d="M16 10.5l6 3.5-6 3.5z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="6" width="16" height="2.4" rx="1.2"/><rect x="4" y="10.8" width="16" height="2.4" rx="1.2"/><rect x="4" y="15.6" width="16" height="2.4" rx="1.2"/></svg>
                 </button>
               </div>
               <ol class="sp-list" id="track-list"></ol>
