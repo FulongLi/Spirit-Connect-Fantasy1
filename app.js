@@ -10,7 +10,7 @@ const books = [
     id: "dark-moon",
     glyph: { zh: "月", en: "DM" },
     title: { zh: "月球暗面", en: "Darkside of the Moon" },
-    kicker: { zh: "档案 I · 挣脱通往真相的第一道枷锁", en: "Archive I · The First Gate" },
+    kicker: { zh: "档案 I · 挣脱通往真相的第一道枷锁", en: "Archive I · Break Free from the First Shackle Toward Truth" },
     status: { zh: "已出版", en: "Published" },
     theme: { zh: "意识迁出 · 死球理论", en: "Consciousness Exodus · Dead Moon Theory" },
     accent: "#2bb8ff",
@@ -18,7 +18,7 @@ const books = [
     link: "novels/dark-moon/",
     description: {
       zh: "遍览古代文明，人类像猴子一样几千年没有成长。阿卡西的海洋像雨水一样浇灌在每一位智人的颅顶，没有高一级的文明介入，就算淹死，猴子依然是猴子。",
-      en: "In 2118, Jim Vale enters a Spirit Connect cabin for his second digital calibration and returns with memories that are not his own. The hidden archive on the Moon begins to open.",
+      en: "Across the sweep of ancient civilizations, humanity has remained like monkeys, unchanged for thousands of years. The ocean of Akasha pours like rain onto the crown of every Homo sapiens; without the intervention of a higher civilization, even if drowned, a monkey remains a monkey.",
     },
   },
   {
@@ -173,7 +173,7 @@ const storyBooks = [
     glyph: "月",
     accent: "#00e5ff",
     title: { zh: "月球暗面", en: "Darkside of the Moon" },
-    subtitle: { zh: "档案 I · 挣脱通往真相的第一道枷锁", en: "Archive I · The First Gate" },
+    subtitle: { zh: "档案 I · 挣脱通往真相的第一道枷锁", en: "Archive I · Break Free from the First Shackle Toward Truth" },
     status: { zh: "已出版", en: "Published" },
     nodes: [
       { zh: ["第二次数字矫正", "2118 年，十八岁的吉姆·维尔走进灵接舱，进行人生第二次数字矫正。这一次，有什么东西没有按程序进行。"], en: ["The Second Correction", "In 2118, Jim Vale enters the connection cabin for his second digital correction. This time, something does not follow the program."] },
@@ -186,7 +186,7 @@ const storyBooks = [
       { zh: ["解构倒计时", "艾拉告诉吉姆真相：安娜与查理正被月暗系统判定为异常意识，并被解构。"], en: ["The Countdown", "Elara tells Jim the truth: Anna and Charlie are being read as anomalies and deconstructed."] },
       { zh: ["LUNA-EXIT", "斯皮尔的旧梦浮出水面：终点不是保存，而是迁出。吉姆决定用真正的肉体登月。"], en: ["LUNA-EXIT", "Spire's sealed program surfaces: the endpoint is not preservation, but migration. Jim decides to go to the Moon in the flesh."] },
       { zh: ["发射与着陆", "穿过不可返回区域，吉姆在月球暗面着陆。没有副本，没有远程连接，没有退路。"], en: ["Launch & Landing", "Through the no-return zone, Jim lands on the far side. No copy, no remote link, no way back."] },
-      { zh: ["肉体死亡", "吉姆完成肉体死亡，进入真实的泰拉撒记录。第一扇门，从里面被打开了。"], en: ["Death of the Body", "Jim completes his bodily death and enters the true Terasa Records. The first door opens from the inside."] },
+      { zh: ["肉体死亡", "吉姆完成肉体死亡，进入真实的泰拉撒记录。第一道枷锁，从里面断开了。"], en: ["Death of the Body", "Jim completes his bodily death and enters the true Terasa Records. The first shackle breaks from within."] },
       { zh: ["下一本入口", "泰拉撒深处，数字吉姆仍然存在。困着安娜与查理的两片区域开始微微发亮。"], en: ["The Next Entrance", "Deep in Terasa, digital Jim still exists. The regions holding Anna and Charlie begin to glow."] },
     ],
     branches: [
@@ -248,9 +248,9 @@ const graphTypes = {
 };
 
 const graphNodes = [
-  ["b1", "book", "月球暗面", "Darkside of the Moon", "档案 I · 挣脱通往真相的第一道枷锁。系列入口。", "Archive I · The First Gate. The entrance to the series."],
+  ["b1", "book", "月球暗面", "Darkside of the Moon", "档案 I · 挣脱通往真相的第一道枷锁。系列入口。", "Archive I · Break Free from the First Shackle Toward Truth. The entrance to the series."],
   ["b2", "book", "巨鲸陨落", "Whale Fall", "档案 II · 法厄同证词。查理在远古战争中的见证。", "Archive II · Phaethon Testimony. Charlie's witness of the ancient war."],
-  ["jim", "character", "吉姆·维尔", "Jim Vale", "第一扇门的打开者。", "Opener of the first door."],
+  ["jim", "character", "吉姆·维尔", "Jim Vale", "挣脱第一道枷锁的人。", "The one who breaks free from the first shackle."],
   ["djim", "character", "数字吉姆", "Digital Jim", "吉姆的数字双生体，主体核问题的入口。", "Jim's digital twin, entrance to the Subject Core problem."],
   ["anna", "character", "安娜·刘易斯", "Anna Lewis", "困于非人类意识区域，《灵猫》的入口。", "Trapped in non-human consciousness; entrance to Mystic Cat."],
   ["charlie", "character", "查理·黑尔", "Charlie Hale", "困于法厄同终战记录中的普通见证者。", "The ordinary witness trapped in the Phaethon record."],
