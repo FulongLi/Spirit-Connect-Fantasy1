@@ -378,17 +378,24 @@ h3 {
   border: 1px solid rgba(171, 226, 255, 0.25);
   border-radius: 8px;
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.56);
+  transition: top 0.45s ease, right 0.45s ease, filter 0.45s ease;
 }
 
-.cover-stack img:first-child {
+/* Front cover = the one matching the active language */
+body[data-lang="zh"] .cover-stack .cover-zh,
+body[data-lang="en"] .cover-stack .cover-en {
   top: 0;
   right: 74px;
   z-index: 2;
+  filter: none;
 }
 
-.cover-stack img:last-child {
+/* Back cover = the other language */
+body[data-lang="zh"] .cover-stack .cover-en,
+body[data-lang="en"] .cover-stack .cover-zh {
   top: 92px;
   right: 0;
+  z-index: 1;
   filter: saturate(0.92) brightness(0.88);
 }
 
@@ -564,18 +571,20 @@ th {
 }
 
 .soundtrack-panel {
-  margin-top: 58px;
-  border-top: 1px solid var(--line);
-  padding-top: 42px;
+  max-width: 640px;
+  margin-top: 30px;
 }
 
 .soundtrack-heading {
   max-width: 740px;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 }
 
 .soundtrack-heading h2 {
-  margin-top: 0;
+  margin: 0;
+  padding-top: 0;
+  border-top: none;
+  font-size: clamp(17px, 2.2vw, 22px);
 }
 
 .soundtrack-heading p:last-child {
@@ -603,15 +612,15 @@ body[data-theme="day"] .soundtrack-player {
 
 .track-now {
   display: grid;
-  grid-template-columns: 64px 1fr;
-  gap: 16px;
+  grid-template-columns: 52px 1fr;
+  gap: 14px;
   align-self: start;
 }
 
 .track-now > span {
   display: grid;
-  width: 64px;
-  height: 64px;
+  width: 52px;
+  height: 52px;
   place-items: center;
   border: 1px solid var(--line-strong);
   border-radius: 50%;
@@ -625,9 +634,9 @@ body[data-theme="day"] .track-now > span {
 }
 
 .track-now h3 {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   color: var(--ink);
-  font-size: clamp(22px, 3vw, 32px);
+  font-size: clamp(16px, 2vw, 20px);
 }
 
 .track-now p {
@@ -642,7 +651,7 @@ body[data-theme="day"] .track-now > span {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 12px;
-  margin-top: 26px;
+  margin-top: 18px;
 }
 
 .player-controls button {
@@ -695,11 +704,13 @@ body[data-theme="day"] .player-controls button:disabled {
   grid-row: 1 / span 2;
   display: grid;
   gap: 8px;
-  max-height: 510px;
-  overflow: auto;
+  /* ~2 tracks tall; the rest scroll with the wheel */
+  max-height: 124px;
+  overflow-y: auto;
   margin: 0;
   padding: 0;
   list-style: none;
+  align-content: start;
 }
 
 .track-list li {
@@ -804,12 +815,15 @@ body[data-theme="day"] .track-list button {
     width: min(210px, 52vw);
   }
 
-  .cover-stack img:first-child {
+  body[data-lang="zh"] .cover-stack .cover-zh,
+  body[data-lang="en"] .cover-stack .cover-en {
     right: auto;
     left: 10%;
   }
 
-  .cover-stack img:last-child {
+  body[data-lang="zh"] .cover-stack .cover-en,
+  body[data-lang="en"] .cover-stack .cover-zh {
+    left: auto;
     right: 8%;
   }
 
@@ -845,7 +859,7 @@ body[data-theme="day"] .track-list button {
   .track-list {
     grid-column: auto;
     grid-row: auto;
-    max-height: none;
+    max-height: 128px;
   }
 
   .player-controls {
