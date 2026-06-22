@@ -15,8 +15,9 @@ encoding issues with Chinese filenames on the web/server). The bilingual display
 | 03 | `audio/requiem-grieving-sky.mp3` | Requiem for the Grieving Sky | 回溯恸天 | 08 五族残骸 / The Remains of Five Peoples | 2:54 |
 | 04 | `audio/phaethon-hymn.mp3` | Hymn of Phaethon | 法厄同圣歌 | 09 日辉族的律令 / The Decrees of the Sunbright | 2:46 |
 | 05 | `audio/phaethon-holy-war.mp3` | The Holy War of Phaethon | 法厄同圣战 | 16 第五行星 / The Fifth Planet | 3:40 |
-| 06 | `audio/moment-of-rising.mp3` | The Moment of Rising | 起身之刻 | 47 醒来之前 / Before Waking | 2:45 |
-| 07 | `audio/ancient-lament-of-return.mp3` | Ancient Lament of Return | 古老的归来挽歌 | 48 蓝鲸在地球歌唱 / Blue Whales Sing on Earth | 1:52 |
+| 06 | `audio/lost-ancient-empire.mp3` | The Lost Ancient Empire | 失落的远古帝国 | 30 法厄同开始下沉 / Phaeton Begins to Sink | 3:00 |
+| 07 | `audio/moment-of-rising.mp3` | The Moment of Rising | 起身之刻 | 47 醒来之前 / Before Waking | 2:45 |
+| 08 | `audio/ancient-lament-of-return.mp3` | Ancient Lament of Return | 古老的归来挽歌 | 48 蓝鲸在地球歌唱 / Blue Whales Sing on Earth | 1:52 |
 
 ## 重命名记录 / Rename log
 - `记忆中的法厄同.mp3` → `phaethon-in-memory.mp3`(中文文件名 → 英文 ASCII / Chinese filename → English ASCII)
@@ -24,6 +25,7 @@ encoding issues with Chinese filenames on the web/server). The bilingual display
 - `法厄同圣歌.mp3` → `phaethon-hymn.mp3`
 - `法厄同圣战.mp3` → `phaethon-holy-war.mp3`
 - `起身之刻.mp3` → `moment-of-rising.mp3`
+- `失落的远古帝国.mp3` → `lost-ancient-empire.mp3`
 
 ## 新增音乐的步骤 / How to add a new track
 1. 把音频放进 `audio/`,文件名用英文 ASCII(如 `my-new-track.mp3`)。
