@@ -20,13 +20,13 @@ window.darkMoonSoundtrack = [
     file: "audio/terasha-record.mp3"
   },
   {
-    id: "gate-before-dawn",
+    id: "moon-landing",
     number: "03",
-    title: { zh: "黎明之前的门", en: "The Gate Before Dawn" },
-    mood: { zh: "破晓将至 · 最后一道门 · 通往下一段", en: "Dawn approaching · The final gate · Toward what comes next" },
+    title: { zh: "登月", en: "Moon Landing" },
+    mood: { zh: "飞向月球 · 升空时刻 · 抵达暗面", en: "Toward the Moon · The moment of liftoff · Reaching the dark side" },
     duration: "4:15",
     chapter: "33",
-    src: "audio/gate-before-dawn.mp3",
-    file: "audio/gate-before-dawn.mp3"
+    src: "audio/moon-landing.mp3",
+    file: "audio/moon-landing.mp3"
   }
 ];
