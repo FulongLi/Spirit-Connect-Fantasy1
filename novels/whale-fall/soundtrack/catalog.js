@@ -50,8 +50,18 @@ window.whaleFallSoundtrack = [
     file: "audio/phaethon-holy-war.mp3"
   },
   {
-    id: "lost-ancient-empire",
+    id: "last-sunbright-heir",
     number: "06",
+    title: { zh: "最后的太阳裔", en: "The Last Sunbright Heir" },
+    mood: { zh: "日辉余烬 · 最后的太阳裔 · 荣光将熄", en: "Embers of the Sunbright · The last heir · A glory about to fade" },
+    duration: "3:13",
+    chapter: "18",
+    src: "audio/last-sunbright-heir.mp3",
+    file: "audio/last-sunbright-heir.mp3"
+  },
+  {
+    id: "lost-ancient-empire",
+    number: "07",
     title: { zh: "失落的远古帝国", en: "The Lost Ancient Empire" },
     mood: { zh: "尘封文明 · 远古辉煌 · 失落的帝国", en: "Buried civilization · Ancient glory · A lost empire" },
     duration: "3:00",
@@ -61,7 +71,7 @@ window.whaleFallSoundtrack = [
   },
   {
     id: "moment-of-rising",
-    number: "07",
+    number: "08",
     title: { zh: "起身之刻", en: "The Moment of Rising" },
     mood: { zh: "苏醒临近 · 重新起身 · 带着疼痛前行", en: "Waking near · Rising again · Moving on through the pain" },
     duration: "2:45",
@@ -71,7 +81,7 @@ window.whaleFallSoundtrack = [
   },
   {
     id: "ancient-lament-of-return",
-    number: "08",
+    number: "09",
     title: { zh: "古老的归来挽歌", en: "Ancient Lament of Return" },
     mood: { zh: "深海回声 · 亿万年归来 · 巨鲸的挽歌", en: "Deep-sea echo · Return across ages · Lament of the whale" },
     duration: "1:52",
