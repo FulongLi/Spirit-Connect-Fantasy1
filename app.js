@@ -10,7 +10,7 @@ const books = [
     id: "dark-moon",
     glyph: { zh: "月", en: "DM" },
     title: { zh: "月球暗面", en: "Darkside of the Moon" },
-    kicker: { zh: "档案 I · 挣脱通往真相的第一道枷锁", en: "Archive I · Break Free from the First Shackle Toward Truth" },
+    kicker: { zh: "档案 I · 死在月球是知晓地球真相最快的方式", en: "Archive I · Dying on the Moon is the fastest way to know the truth of Earth" },
     status: { zh: "已出版", en: "Published" },
     theme: { zh: "意识迁出 · 死球理论", en: "Consciousness Exodus · Dead Moon Theory" },
     accent: "#2bb8ff",
