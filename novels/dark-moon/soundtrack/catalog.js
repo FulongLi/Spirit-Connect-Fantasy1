@@ -10,8 +10,18 @@ window.darkMoonSoundtrack = [
     file: "audio/city-that-ages-with-my-steps.mp3"
   },
   {
-    id: "terasha-record",
+    id: "echoes-of-a-fallen-empire",
     number: "02",
+    title: { zh: "陨落帝国的回响", en: "Echoes of a Fallen Empire" },
+    mood: { zh: "废墟回响 · 覆灭的帝国 · 远古余音", en: "Echoes through ruins · A fallen empire · Ancient resonance" },
+    duration: "3:00",
+    chapter: "21",
+    src: "audio/echoes-of-a-fallen-empire.mp3",
+    file: "audio/echoes-of-a-fallen-empire.mp3"
+  },
+  {
+    id: "terasha-record",
+    number: "03",
     title: { zh: "泰拉撒记录", en: "Terasha Record" },
     mood: { zh: "月暗记录 · 泰拉撒之门 · 档案回响", en: "Lunar-dark record · The Terasha gate · Echoes of the archive" },
     duration: "3:13",
@@ -21,7 +31,7 @@ window.darkMoonSoundtrack = [
   },
   {
     id: "moon-landing",
-    number: "03",
+    number: "04",
     title: { zh: "登月", en: "Moon Landing" },
     mood: { zh: "飞向月球 · 升空时刻 · 抵达暗面", en: "Toward the Moon · The moment of liftoff · Reaching the dark side" },
     duration: "4:15",
